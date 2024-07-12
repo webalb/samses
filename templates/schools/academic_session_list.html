@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %} Academic session lists {% endblock %}
+
+{% block content %}
+  <h2>Schools academic sessions</h2>
+  <a class="btn-add" href="{% url 'schools:academic_session_create' %}">Set Academic session for schools</a>
+  <ul>
+    {% for  session in academic_sessions %}
+      <li>
+        {% if session.school_type == 'all'%}
+           <p> Session set for All Schools  </p>
+        {% elif session.school_type == 'individual'%}
+           <p> Session set for {{ session.school.name }}  </p>
+        {% else %}
+           <p> Session set for all {{ session.get_school_type_display }}  </p>
+        {% endif %}
+        <ul>
+          <li>Session: {{ session.session_name }}</li>
+          <li>Begin on: {{ session.start_date }}</li>
+          <li>end on: {{ session.end_date }} <br><br>
+          <a class="btn-edit" href="{% url 'schools:academic_session_update' session.pk %}">Edit</a>
+          <a class="btn-del" href="{% url 'schools:academic_session_delete' session.pk %}">Delete</a>
+          </li>
+          
+        </ul>
+    {% endfor %}
+  </ul>
+{% endblock %}

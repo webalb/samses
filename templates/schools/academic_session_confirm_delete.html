@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %} Delete school academic session {% endblock %}
+
+{% block content %}
+  <h2>Delete School Academic Session</h2>
+  <p>Are you sure you want to delete the following session from this server?</p>
+  <p><b> {{ session.school.name }}  </b></p>
+        <ul>
+          <li>Session: {{ session.session_name }}</li>
+          <li>Begin on: {{ session.start_date }}</li>
+          <li>end on: {{ session.end_date }} </li>
+          </ul>
+          <br><br>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn" type="submit">Yes, delete</button>
+    <a href="{% url 'schools:academic_sessions' %}">Cancel</a>
+  </form>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body>
+    <div id="header">
+        <span class="logo">SecureEduSert</span>
+        {% if request.user.is_authenticated %}
+            <ul class="menu">
+                <li {% if section == 'dashboard' %} class="selected" {% endif %}>
+                    <a href="{% url 'users:dashboard' %}">My Dashboard</a>
+                </li>
+            </ul>
+        {% endif %}
+        <span class="user">
+            {% if request.user.is_authenticated %}
+                Hello {{ request.user.first_name|default:request.user.username }},
+                <a href="{% url 'users:logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'users:login' %}">Login</a>
+            {% endif %}
+        </span>
+    </div>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tag }}">{{ message|safe }}</li>
+                <a href="#" class="close">X</a>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            function toggleSchoolField() {
+                if ($('#id_school_type').val() === 'individual') {
+                    $('#id_school').prop('disabled', false);
+                } else {
+                    $('#id_school').prop('disabled', true);
+                    $('#id_school').val('');  // Clear the selected value
+                }
+            }
+
+            // Initialize the form
+            toggleSchoolField();
+
+            // Bind change event to school_type field
+            $('#id_school_type').change(function() {
+                toggleSchoolField();
+            });
+        });
+    </script>
+</body>
+</html>

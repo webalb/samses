@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} School lists {% endblock %}
+
+{% block content %}
+  <h2>Schools</h2>
+  <a href="{% url 'schools:create' %}">Add New School</a>
+  <ul>
+    {% for school in schools %}
+      <li><a href="{% url 'schools:details' school.pk %}">{{ school.name }}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

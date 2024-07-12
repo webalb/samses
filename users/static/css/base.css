@@ -1,0 +1,76 @@
+#header ul {
+    list-style: none;
+    display: inline;
+}
+#header {
+    background-color: rgb(8, 218, 43);
+    display: flex;
+    
+}
+body{
+    background-color: rgb(229, 223, 223);
+    color: #444;
+}
+#content {
+    width: 40%;
+    margin-left: 30%;
+    margin-right: 30%;
+    background-color: white;
+    text-align: justify;
+    color: #444;
+    margin-top: 10%;
+    padding: 2rem;
+}
+input, button{
+    padding: 5px;
+    border: 2px solid rgb(119, 244, 146);
+    border-radius: 15px;
+
+}
+button {
+    color: #ddd;
+    background-color: rgb(9, 110, 3); 
+}
+.form-control {
+    width: 100%;
+    margin: 1rem;
+}
+
+.btn-edit, .btn-del, .btn-add {
+    text-decoration: none;
+    padding: 10px 6px;
+    
+}
+
+.btn-edit {
+    background-color: rgb(205, 205, 233);
+    color: #444;
+}
+.btn-del {
+    background-color: rgb(243, 217, 217);
+    color: #444;
+}
+.btn-add {
+    background-color: rgb(218, 216, 216);
+    color: #444;
+}
+
+button{
+    padding: 1rem 2rem;
+    cursor: pointer;
+}
+
+.messages {
+    display: block;
+    list-style-type: none;
+    font-size: large;
+}
+
+.messages .error {
+    background-color: red;
+    color: #aaa;
+}
+.messages .success {
+    background-color: green;
+    color: white;
+}

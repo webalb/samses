@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %} School Details {% endblock %}
+
+{% block content %}
+<center>
+<p>
+  {% if school.logo %}
+    <img width="100" height="100" src="{{ school.logo.url }}" alt="{{ school.name }} Logo">
+  {% else %}
+    <p>No logo available.</p>
+  {% endif %}
+</p>
+  <h2>{{ school.name|upper }}</h2>
+</center>
+  <p> {{ school.moto }} </p>
+  <p> {{ school.school_number }} </p>
+  <p>Type: {{ school.get_school_type_display }}</p>
+  <p>LGA: {{ school.lga }}</p>
+  <p>Ward: {{ school.ward }}</p>
+  <p>Email: {{ school.school_email }}</p>
+  <p>Phone: {{ school.school_phone_number }}</p>
+  <p>Website: {{ school.school_website }}</p>
+  <p>Program: {{ school.get_program_display }}</p>
+    {% if academic_session %}
+      {% if academic_session.start_date <= today <= academic_session.end_date %}
+          <p>Academic session: <b> {{ academic_session.session_name }} </b> is ongoing and will end on {{ academic_session.end_date|date:"l, F d, Y" }}.</p>
+      {% elif today < academic_session.start_date %}
+          <p>Academic session: <b>{{ academic_session.session_name }}</b> will start on {{ academic_session.start_date|date:"l, F d, Y" }}.</p>
+      {% else %}
+          <p>Academic session: <b>{{ academic_session.session_name }}</b> ended on {{ academic_session.end_date|date:"l, F d, Y" }}.</p>
+      {% endif %}
+    {% else %}
+      <p>Academic session: No academic session is set.</p>
+    {% endif %}
+  <a href="{% url 'schools:list' %}">Back to List</a>
+  <a href="{% url 'schools:delete' school.pk %}">Delete</a>
+  <a href="{% url 'schools:update' school.pk %}">Edit</a>
+{% endblock %}

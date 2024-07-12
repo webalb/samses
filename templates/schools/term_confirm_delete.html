@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} Term delete {% endblock %}
+
+{% block content %}
+  <h2>Delete Term</h2>
+  <p>Are you sure you want to delete <b>{{ term }}</b> from this server?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="{% url 'schools:term_list' %}">Cancel</a>
+  </form>
+{% endblock %}
