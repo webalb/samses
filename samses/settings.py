@@ -13,6 +13,8 @@ from decouple import config
 from pathlib import Path
 import os
 
+from django import conf
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -163,17 +165,17 @@ AUTHENTICATION_BACKENDS = [
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 # Facebook social OAuth info
-SOCIAL_AUTH_FACEBOOK_KEY = '848987747134641'
-SOCIAL_AUTH_FACEBOOK_SECRET = '2b283ab8403ce83b9f563eee6274512f'
+SOCIAL_AUTH_FACEBOOK_KEY = config('FACEBOOK_KEY')
+SOCIAL_AUTH_FACEBOOK_SECRET = config('FACEBOOK_SECRET')
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'public_profile']
 
 # Twitter social OAuth info
-SOCIAL_AUTH_TWITTER_KEY = 'fNkQFSeNU2U5mOxDC1SqqqXTL'
-SOCIAL_AUTH_TWITTER_SECRET = 'UOGPKjPEWYGTeQhzdUQhO5aLxyEGLB4qWoPkXDsPAl0RXmabOw'
+SOCIAL_AUTH_TWITTER_KEY = config('TWITTER_KEY')
+SOCIAL_AUTH_TWITTER_SECRET = config('TWITTER_SECRET')
 
 # Google social OAuth info
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '19863852771-6t0ft2vc1grtuqv22eo6akmud9s93osk.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config('GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config('GOOGLE_OAUTH2_SECRET')
 
 # setting pipelines for registering new user via social auth 
 SOCIAL_AUTH_PIPELINE = [
