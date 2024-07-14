@@ -65,9 +65,9 @@ Create a `.env` file in the project root directory and add the following environ
 
 SECRET_KEY=your-secret-key
 DEBUG=True
-DATABASE_NAME=samses_db
-DATABASE_USER=postgres
-DATABASE_PASSWORD=2530(P)Cainoa
+DATABASE_NAME=your_db_name
+DATABASE_USER=your_db_user
+DATABASE_PASSWORD=Your_user_password
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
 ```
