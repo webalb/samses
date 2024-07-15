@@ -29,9 +29,55 @@
       {% else %}
           <p>Academic session: <b>{{ academic_session.session_name }}</b> ended on {{ academic_session.end_date|date:"l, F d, Y" }}.</p>
       {% endif %}
+
+      <h4>Term Details:</h4>
+            {% if academic_session.term_dates %}
+                <ul>
+                    {% if academic_session.term_dates.start_date_1 %}
+                        <li>First Term: {{ academic_session.term_dates.start_date_1 }} - {{ academic_session.term_dates.end_date_1 }}</li>
+                    {% endif %}
+                    {% if academic_session.term_dates.start_date_2 %}
+                        <li>Second Term: {{ academic_session.term_dates.start_date_2 }} - {{ academic_session.term_dates.end_date_2 }}</li>
+                    {% endif %}
+                    {% if academic_session.term_dates.start_date_3 %}
+                        <li>Third Term: {{ academic_session.term_dates.start_date_3 }} - {{ academic_session.term_dates.end_date_3 }}</li>
+                    {% endif %}
+                </ul>
+            {% else %}
+                <p>No terms set for this school</p>
+                <a href="{% url 'schools:term_create_or_update' academic_session.id %}">Set Terms for this school's Academic Session</a>
+            {% endif %}
     {% else %}
       <p>Academic session: No academic session is set.</p>
     {% endif %}
+
+    <!-- Subjects sections -->
+    <h2>Subjects</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Subject Name</th>
+                <th>Program</th>
+                <th>Type</th>
+                <th>Optional</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject in subjects %}
+                <tr>
+                    <td>{{ subject.subject_name }}</td>
+                    <td>{{ subject.get_program_display }}</td>
+                    <td>{{ subject.is_general|yesno:"General,Specific" }}</td>
+                    <td>{{ subject.is_optional|yesno:"Yes,No" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No subjects available for this school.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
   <a href="{% url 'schools:list' %}">Back to List</a>
   <a href="{% url 'schools:delete' school.pk %}">Delete</a>
   <a href="{% url 'schools:update' school.pk %}">Edit</a>

@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load custom_filters %}
+
 {% block title %} Academic session lists {% endblock %}
 
 {% block content %}
@@ -16,10 +18,28 @@
         {% endif %}
         <ul>
           <li>Session: {{ session.session_name }}</li>
+          <li>Program: {{ session.get_program_display }}</li>
+          <li>Duration: {{ session.duration|readable_day_count }}</li>
           <li>Begin on: {{ session.start_date }}</li>
           <li>end on: {{ session.end_date }} <br><br>
-          <a class="btn-edit" href="{% url 'schools:academic_session_update' session.pk %}">Edit</a>
-          <a class="btn-del" href="{% url 'schools:academic_session_delete' session.pk %}">Delete</a>
+          <li>
+            <h4>Term Details:</h4>
+            {% if session.term_dates %}
+                <ul>
+                    {% if session.term_dates.start_date_1 %}
+                        <li>First Term: {{ session.term_dates.start_date_1 }} - {{ session.term_dates.end_date_1 }}</li>
+                    {% endif %}
+                    {% if session.term_dates.start_date_2 %}
+                        <li>Second Term: {{ session.term_dates.start_date_2 }} - {{ session.term_dates.end_date_2 }}</li>
+                    {% endif %}
+                    {% if session.term_dates.start_date_3 %}
+                        <li>Third Term: {{ session.term_dates.start_date_3 }} - {{ session.term_dates.end_date_3 }}</li>
+                    {% endif %}
+                </ul>
+            {% else %}
+                <p>No terms set for this academic session.</p>
+                <a href="{% url 'schools:term_create_or_update' session.id %}">Set Terms for this Academic Session</a>
+            {% endif %}
           </li>
           
         </ul>

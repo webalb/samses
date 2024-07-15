@@ -12,15 +12,18 @@ body{
     color: #444;
 }
 #content {
-    width: 40%;
-    margin-left: 30%;
-    margin-right: 30%;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
     background-color: white;
     text-align: justify;
     color: #444;
     margin-top: 10%;
     padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Optional: adds a subtle shadow */
+    border-radius: 8px;  /* Optional: adds rounded corners */
 }
+
 input, button{
     padding: 5px;
     border: 2px solid rgb(119, 244, 146);

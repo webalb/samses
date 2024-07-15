@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
+    <style>{% block style %}{% endblock %}</style>
+    
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
 <body>
@@ -36,7 +38,7 @@
         </ul>
     {% endif %}
 
-    <div id="content">
+    <div id="content" style="width: 80%;">
         {% block content %}
         {% endblock %}
     </div>

@@ -18,8 +18,10 @@ urlpatterns = [
    
     path('terms/', views.term_list, name='term_list'),
     path('terms/<int:pk>/', views.term_detail, name='term_detail'),
-    path('terms/create/', views.term_create, name='term_create'),
-    path('terms/<int:pk>/update/', views.term_update, name='term_update'),
-    path('terms/<int:pk>/delete/', views.term_delete, name='term_delete'),
+    path('terms/<int:academic_session_id>/set_or_update/', views.term_create_or_update, name='term_create_or_update'),
+    path('terms/<int:academic_session_id>/delete/', views.term_delete, name='term_delete'),
+
+    path('subjects/', views.subject_list, name='subject_list'),
+    path('subjects/add/', views.subject_create, name='subject_create'),
 ]
 

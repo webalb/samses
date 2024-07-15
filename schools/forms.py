@@ -58,7 +58,7 @@ class AcademicSessionForm(forms.ModelForm):
 
     class Meta:
         model = AcademicSession
-        fields = ['school_type', 'school', 'session_name', 'start_date', 'end_date']
+        fields = ['school_type','program', 'school', 'session_name', 'start_date', 'end_date']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -80,72 +80,46 @@ class AcademicSessionForm(forms.ModelForm):
 
 
 class TermForm(forms.ModelForm):
-    start_date = forms.DateField(widget=DateInput)
-    end_date = forms.DateField(widget=DateInput)
-    
     class Meta:
         model = Term
-        fields = ['academic_session', 'term_name', 'start_date', 'end_date']
+        fields = ['academic_session', 'start_date_1', 'end_date_1', 'start_date_2', 'end_date_2', 'start_date_3', 'end_date_3']
+        widgets = {
+            'start_date_1': forms.DateInput(attrs={'type': 'date', 'label': 'First term start date'}),
+            'end_date_1': forms.DateInput(attrs={'type': 'date', 'label': 'First term end date'}),
+            'start_date_2': forms.DateInput(attrs={'type': 'date', 'label': 'Second term start date'}),
+            'end_date_2': forms.DateInput(attrs={'type': 'date', 'label': 'Second term end date'}),
+            'start_date_3': forms.DateInput(attrs={'type': 'date', 'label': 'Third term start date'}),
+            'end_date_3': forms.DateInput(attrs={'type': 'date', 'label': 'Third term end date'}),
+        }
 
     def __init__(self, *args, **kwargs):
-        super(TermForm, self).__init__(*args, **kwargs)
-        today = date.today()
-        self.fields['academic_session'].queryset = AcademicSession.objects.filter(end_date__gte=today)
+        super().__init__(*args, **kwargs)
+        
+        instance = kwargs.get('instance')
+        if instance:
+            self.fields['start_date_1'].initial = instance.start_date_1
+            self.fields['end_date_1'].initial = instance.end_date_1
+            self.fields['start_date_2'].initial = instance.start_date_2
+            self.fields['end_date_2'].initial = instance.end_date_2
+            self.fields['start_date_3'].initial = instance.start_date_3
+            self.fields['end_date_3'].initial = instance.end_date_3
 
-    def clean(self):
-        cleaned_data = super().clean()
-        academic_session = cleaned_data.get("academic_session")
-        term_name = cleaned_data.get("term_name")
-        start_date = cleaned_data.get("start_date")
-        end_date = cleaned_data.get("end_date")
-        instance = self.instance
-
-        if academic_session is None:
-            raise forms.ValidationError("Academic session is required.")
-
-        if start_date is None or end_date is None:
-            raise forms.ValidationError("Start date and end date are required.")
-
-        # Validate term order and dates
-        if term_name == '1':  # First Term
-            if not (academic_session.start_date <= start_date <= end_date <= academic_session.end_date):
-                raise forms.ValidationError("First term must start after the session start date and end before the session end date.")
-        elif term_name == '2':  # Second Term
-            first_term = Term.objects.filter(academic_session=academic_session, term_name='1').first()
-            if not first_term:
-                raise forms.ValidationError("First term must be set before the second term.")
-            if not (first_term.end_date < start_date <= end_date <= academic_session.end_date):
-                raise forms.ValidationError("Second term must start after the first term ends and end before the session end date.")
-        elif term_name == '3':  # Third Term
-            second_term = Term.objects.filter(academic_session=academic_session, term_name='2').first()
-            if not second_term:
-                raise forms.ValidationError("Second term must be set before the third term.")
-            if not (second_term.end_date < start_date <= end_date <= academic_session.end_date):
-                raise forms.ValidationError("Third term must start after the second term ends and end before the session end date.")
-
-        # Ensure term is not duplicated, exclude the current instance if updating
-        if Term.objects.filter(academic_session=academic_session, term_name=term_name).exclude(pk=instance.pk).exists():
-            raise forms.ValidationError(f"The {self.fields['term_name'].choices[int(term_name) - 1][1]} for this academic session has already been set.") # type: ignore
-
-        today = date.today()
-        if academic_session.end_date < today:
-            raise forms.ValidationError("The term cannot be set for a past academic session.")
-
-        return cleaned_data
 
 class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
-        fields = ['subject_name', 'program', 'is_general', 'school']
-
+        fields = ['subject_name', 'program', 'is_general', 'is_optional', 'school']
+    
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super(SubjectForm, self).__init__(*args, **kwargs)
-        
-        if user and user.is_ministry_admin:
-            self.fields['school'].queryset = School.objects.all()
-        elif user and user.is_school_admin:
-            self.fields['school'].queryset = School.objects.filter(id=user.school_id)
-            self.fields['is_general'].widget = forms.HiddenInput()
-            self.fields['school'].initial = user.school
-            self.fields['school'].widget = forms.HiddenInput()
+        super().__init__(*args, **kwargs)
+        self.fields['school'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        is_general = cleaned_data.get('is_general')
+        school = cleaned_data.get('school')
+
+        if not is_general and not school:
+            self.add_error('school', 'This field is required for non-general subjects.')
+
+        return cleaned_data

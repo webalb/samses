@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from itertools import zip_longest
 
 from .forms import SchoolForm, AcademicSessionForm, SubjectForm, TermForm
 from .models import School, AcademicSession, Subject, Term
@@ -37,7 +38,7 @@ def school_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'School updated successfully!')  # Display success message
-            return redirect('schools:list')
+            return redirect('schools:details', pk=pk)
         else:
             messages.error(request, 'Something bad happens, please review the data you provided')  # Display success message
     else:
@@ -53,9 +54,11 @@ def school_list(request):
 def school_details(request, pk):
     school = get_object_or_404(School, pk=pk)
     academic_session = school.get_academic_session()
+    subjects = school.get_subjects()
     context = {
         'school': school,
         'academic_session': academic_session,
+        'subjects': subjects,
     }
     return render(request, 'schools/school_details.html', context)
 
@@ -143,27 +146,21 @@ def term_detail(request, pk):
     return render(request, 'schools/term_detail.html', {'term': term})
 
 @login_required
-def term_create(request):
-    if request.method == "POST":
-        form = TermForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('schools:term_list')
-    else:
-        form = TermForm()
-    return render(request, 'schools/term_create.html', {'form': form})
+def term_create_or_update(request, academic_session_id):
+    academic_session = get_object_or_404(AcademicSession, id=academic_session_id)
+    term, created = Term.objects.get_or_create(academic_session=academic_session)
 
-@login_required
-def term_update(request, pk):
-    term = get_object_or_404(Term, pk=pk)
-    if request.method == "POST":
+    if request.method == 'POST':
         form = TermForm(request.POST, instance=term)
         if form.is_valid():
             form.save()
-            return redirect('schools:term_list')
+            messages.success(request, 'Term details saved successfully!')
+            return redirect('schools:academic_sessions')  # Redirect to the appropriate view after saving
     else:
         form = TermForm(instance=term)
-    return render(request, 'schools/term_create.html', {'form': form})
+    
+    return render(request, 'schools/term_create.html', {'form': form, 'academic_session': academic_session})
+
 
 @login_required
 def term_delete(request, pk):
@@ -183,13 +180,6 @@ def term_delete(request, pk):
 |           subject model.          |
 ====================================
 """
-@login_required
-def subject_list(request):
-    if request.user.is_ministry_admin:
-        subjects = Subject.objects.all()
-    else:
-        subjects = Subject.objects.filter(school=request.user.school) | Subject.objects.filter(is_general=True)
-    return render(request, 'schools/subject_list.html', {'subjects': subjects})
 
 @login_required
 def subject_detail(request, pk):
@@ -198,14 +188,27 @@ def subject_detail(request, pk):
 
 @login_required
 def subject_create(request):
-    if request.method == "POST":
-        form = SubjectForm(request.POST, user=request.user)
+    if request.method == 'POST':
+        form = SubjectForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Subject added successfully!')
             return redirect('schools:subject_list')
     else:
-        form = SubjectForm(user=request.user)
+        form = SubjectForm()
     return render(request, 'schools/subject_create.html', {'form': form})
+
+@login_required
+def subject_list(request):
+    subjects = Subject.objects.all()
+    primary_subjects = list(subjects.filter(program='primary'))
+    jss_subjects = list(subjects.filter(program='jss'))
+    sss_subjects = list(subjects.filter(program='sss'))
+
+    # Use zip_longest to handle programs with different numbers of subjects
+    subject_rows = list(zip_longest(primary_subjects, jss_subjects, sss_subjects, fillvalue=None)) # type: ignore
+
+    return render(request, 'schools/subject_list.html', {'subject_rows': subject_rows})
 
 @login_required
 def subject_update(request, pk):

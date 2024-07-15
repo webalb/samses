@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %} Subject lists {% endblock %}
+{% block style %}
+  table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+  th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+  }
+  th {
+      background-color: #f2f2f2;
+      text-align: left;
+  }
+  .col-span {
+      grid-column: span 2;
+  }
+{% endblock %}
+{% block content %}
+  <h2>Subjects</h2>
+  <a href="{% url 'schools:subject_create' %}">Add New Subject</a>
+  <table>
+    <thead>
+        <tr style="text-align: center;">
+            <th colspan="3">Primary</th>
+            <th colspan="3">Junior Secondary School</th>
+            <th colspan="3">Senior Secondary School</th>
+        </tr>
+        <tr>
+            <th>Subject Name</th>
+            <th>General/Specific</th>
+            <th>Optional</th>
+            <th>Subject Name</th>
+            <th>General/Specific</th>
+            <th>Optional</th>
+            <th>Subject Name</th>
+            <th>General/Specific</th>
+            <th>Optional</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for primary_subject, jss_subject, sss_subject in subject_rows %}
+        <tr>
+            <td>
+                {% if primary_subject %}
+                    {{ primary_subject.subject_name }}
+                {% endif %}
+            </td>
+            <td>
+                {% if primary_subject %}
+                    {% if primary_subject.is_general %}
+                        General
+                    {% else %}
+                        Specific
+                    {% endif %}
+                {% endif %}
+            </td>
+            <td>
+                {% if primary_subject %}
+                    {% if primary_subject.is_optional %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                {% endif %}
+            </td>
+            <td>
+                {% if jss_subject %}
+                    {{ jss_subject.subject_name }}
+                {% endif %}
+            </td>
+            <td>
+                {% if jss_subject %}
+                    {% if jss_subject.is_general %}
+                        General
+                    {% else %}
+                        Specific
+                    {% endif %}
+                {% endif %}
+            </td>
+            <td>
+                {% if jss_subject %}
+                    {% if jss_subject.is_optional %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                {% endif %}
+            </td>
+            <td>
+                {% if sss_subject %}
+                    {{ sss_subject.subject_name }}
+                {% endif %}
+            </td>
+            <td>
+                {% if sss_subject %}
+                    {% if sss_subject.is_general %}
+                        General
+                    {% else %}
+                        Specific
+                    {% endif %}
+                {% endif %}
+            </td>
+            <td>
+                {% if sss_subject %}
+                    {% if sss_subject.is_optional %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
