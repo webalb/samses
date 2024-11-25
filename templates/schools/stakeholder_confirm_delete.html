@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} Remove Stakeholder {% endblock %}
+
+{% block content %}
+  <h2>Remove This Stakeholder from {{ stakeholder.school.name }}</h2>
+  <p>Are you sure you want to delete <b>{{ stakeholder.stakeholder_name }}</b> from this server?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="{% url 'schools:stakeholder_create' stakeholder.school.id %}">Cancel</a>
+  </form>
+{% endblock %}

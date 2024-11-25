@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %} School Stakeholder's list {% endblock %}
+
+{% block content %}
+
+<h2>School Stakeholders</h2>
+
+<!-- Button to trigger create modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal">
+    Add New Stakeholder
+</button>
+
+<!-- Stakeholder List -->
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stakeholder in stakeholders %}
+        <tr>
+            <td>{{ stakeholder.stakeholder_name }}</td>
+            <td>{{ stakeholder.position }}</td>
+            <td>{{ stakeholder.contact_phone }}</td>
+            <td>{{ stakeholder.email }}</td>
+            <td>
+                <!-- Edit button -->
+                <button type="button" class="btn btn-warning" data-toggle="modal" 
+                        data-target="#editModal" data-id="{{ stakeholder.id }}">
+                    Edit
+                </button>
+
+                <!-- Delete button -->
+                <button type="button" class="btn btn-danger" data-toggle="modal" 
+                        data-target="#deleteModal" data-id="{{ stakeholder.id }}">
+                    Delete
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<!-- Edit Modal (Loaded dynamically via JavaScript) -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="editForm" action="#" method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Stakeholder</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form fields will be loaded here dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+
+    // CSRF token setup for AJAX requests
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = jQuery.trim(cookies[i]);
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // Attach CSRF token to AJAX requests
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    });
+
+    // Handle Create form submission
+    $('#createForm').on('submit', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        $.ajax({
+            type: form.attr('method'),
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(response) {
+                // Close modal and reload stakeholder list
+                $('#createModal').modal('hide');
+                location.reload();  // Reload page to show the new stakeholder
+            },
+            error: function(response) {
+                console.log(response.responseText);
+                alert("Error creating stakeholder. Please try again.");
+            }
+        });
+    });
+
+    // Open Edit Modal and load stakeholder data into form
+    $('#editModal').on('show.bs.modal', function(event) {
+        const button = $(event.relatedTarget); // Button that triggered the modal
+        const stakeholderId = button.data('id');
+        const modal = $(this);
+
+        // Fetch stakeholder data via AJAX
+        $.ajax({
+            url: `/school/stakeholders/${stakeholderId}/update/`,
+            type: 'GET',
+            success: function(response) {
+                modal.find('.modal-body').html(response);
+                $('#editForm').attr('action', `/school/stakeholders/${stakeholderId}/update/`);
+            },
+            error: function(response) {
+                console.log(response.responseText);
+                alert("Error loading stakeholder data.");
+            }
+        });
+    });
+
+    // Handle Edit form submission
+    $('#editForm').on('submit', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        $.ajax({
+            type: form.attr('method'),
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(response) {
+                // Close modal and reload stakeholder list
+                $('#editModal').modal('hide');
+                location.reload();  // Reload page to show the updated stakeholder
+            },
+            error: function(response) {
+                console.log(response.responseText);
+                alert("Error updating stakeholder. Please try again.");
+            }
+        });
+    });
+
+    // Open Delete Modal and set form action
+    $('#deleteModal').on('show.bs.modal', function(event) {
+        const button = $(event.relatedTarget); // Button that triggered the modal
+        const stakeholderId = button.data('id');
+        $('#deleteForm').attr('action', `/school/stakeholders/${stakeholderId}/delete/`);
+    });
+
+    // Handle Delete form submission
+    $('#deleteForm').on('submit', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        $.ajax({
+            type: form.attr('method'),
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(response) {
+                // Close modal and reload stakeholder list
+                $('#deleteModal').modal('hide');
+                location.reload();  // Reload page to remove the deleted stakeholder
+            },
+            error: function(response) {
+                console.log(response.responseText);
+                alert("Error deleting stakeholder. Please try again.");
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

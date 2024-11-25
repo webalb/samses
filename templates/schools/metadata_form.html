@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %} Metadata {% if form.instance.pk %}Update{% else %}create{% endif %} {% endblock %}
+{% block content %}
+<h2>{% if form.instance.pk %}Update/Edit{% else %}Set{% endif %} Metadata for {{ school.name }} </h2>
+<form method="post">
+    {% csrf_token %}
+    <p>
+        <input type="hidden" name="{{ form.school.html_name }}" value="{{ school.id }}" id="{{ form.school.id_for_label }}">
+    </p>
+    <div class="form-control" style="margin: 1rem;">
+        {{ form.language_of_instruction.errors }}
+        <label for="{{ form.language_of_instruction.id_for_label }}">Language of Instruction</label>
+        {{ form.language_of_instruction }}
+    </div>
+    <div class="form-control" style="margin: 1rem;">
+        {{ form.enrollment_capacity.errors }}
+        <label for="{{ form.enrollment_capacity.id_for_label }}">Enrollment Capacity</label>
+        {{ form.enrollment_capacity }}
+    </div>
+    
+    <button type="submit">{% if form.instance.pk %}Update{% else %}Set{% endif %}</button>
+</form>
+<a href="{% url 'schools:details' school.pk %}">Back to School details</a>
+{% endblock %}

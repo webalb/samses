@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %} School Details {% endblock %}
+{% load custom_filters %}
 
 {% block content %}
 <center>
@@ -9,17 +10,34 @@
   {% else %}
     <p>No logo available.</p>
   {% endif %}
-</p>
-  <h2>{{ school.name|upper }}</h2>
+</p> 
+
+  <h2>{{ school.name|upper }} {% if school.abbreviation %} ({{school.abbreviation}}) {% endif %}</h2>
+  <p> <span style="color: red">Motto:</span> {{ school.motto }} </p>
+
 </center>
-  <p> {{ school.moto }} </p>
-  <p> {{ school.school_number }} </p>
+<hr>
+  <p> <b>Scool registration Number: </b>{{ school.registration_number }} </p>
+  <p><b>School Acreditation Number:</b> 
+    {% if school.get_current_accreditation %}
+        {% with accr=school.get_current_accreditation %}
+            {{ accr.accreditation_number }}
+        {% endwith %}
+    {% endif %}
+  </p>
   <p>Type: {{ school.get_school_type_display }}</p>
+  <p>Established on: {{ school.established_date }}</p>
+
+  <h4>Address:</h4>
   <p>LGA: {{ school.lga }}</p>
+  <p>{% if school.city %} City: {{school.city}} {% endif %}</p>
   <p>Ward: {{ school.ward }}</p>
-  <p>Email: {{ school.school_email }}</p>
-  <p>Phone: {{ school.school_phone_number }}</p>
-  <p>Website: {{ school.school_website }}</p>
+  <p>Street Address: {{ school.street_address }}</p>
+
+  <h4>Contact Info:</h4>
+  <p>Email: {{ school.email }}</p>
+  <p>Phone: {{ school.phone }}</p>
+  <p>Website: {{ school.website }}</p>
   <p>Program: {{ school.get_program_display }}</p>
     {% if academic_session %}
       {% if academic_session.start_date <= today <= academic_session.end_date %}
@@ -29,8 +47,8 @@
       {% else %}
           <p>Academic session: <b>{{ academic_session.session_name }}</b> ended on {{ academic_session.end_date|date:"l, F d, Y" }}.</p>
       {% endif %}
-
-      <h4>Term Details:</h4>
+<hr>
+    <h4>Term Details:</h4>
             {% if academic_session.term_dates %}
                 <ul>
                     {% if academic_session.term_dates.start_date_1 %}
@@ -51,7 +69,37 @@
       <p>Academic session: No academic session is set.</p>
     {% endif %}
 
-    <!-- Subjects sections -->
+    <!-- Metadata section --><hr>
+    <h2>School Metadata</h2>
+    {% if school.schoolmetadata %}
+        <p> <b>Language of instruction:</b> {{ school.schoolmetadata.get_language_of_instruction_display }} </p>
+         <p> <b>Enrollment capacity:</b> {{ school.schoolmetadata.enrollment_capacity }} </p>
+         <a href="{% url 'schools:metadata_update' school.schoolmetadata.pk %}">Update Metadata for this school.</a> |
+            <a href="{% url 'schools:metadata_delete' school.schoolmetadata.pk %}">Delete Metadata for this school.</a> 
+    {% else %}
+        <a href="{% url 'schools:metadata_set' school.pk %}">Set Metadata for this school.</a> 
+    {% endif %}
+     <!-- Accreditation information section --><hr>
+    <h2>School Accreditation information</h2>
+    {% if school.get_current_accreditation %}
+        {% with accr=school.get_current_accreditation %}
+            <p> <b>Accreditation status:</b> {{ accr.get_status_display }} </p>
+            <p> <b>Valid From:</b> {{ accr.valid_from }} </p>
+            <p> <b>Valid To:</b> {{ accr.valid_to }} </p>
+            {% if accr.expired %}<p><strong>Acreditation expired</strong></p>{% endif %}
+            <progress max="{% max_days accr.valid_to accr.valid_from %}" value="{% days_attained accr.valid_from %}"></progress>
+             <a href="{% url 'schools:accreditation_set' school.pk %}">Take another action.</a> 
+        {% endwith %}
+    {% elif school.recent_accreditation_status %}
+        {% with accr=school.recent_accreditation_status %}
+            <p> <b>Status:</b> {{ accr.get_status_display }} </p>
+            <p> <b>Created on:</b> {{ accr.created_at }}</p>
+            <a href="{% url 'schools:accreditation_set' school.pk %}">Take another action.</a>
+        {% endwith %}
+    {% else %}
+        <a href="{% url 'schools:accreditation_set' school.pk %}">Set Accreditation Status for this school.</a> 
+    {% endif %}
+    <!-- Subjects sections --><hr>
     <h2>Subjects</h2>
     <table>
         <thead>
@@ -78,7 +126,43 @@
         </tbody>
     </table>
 
-  <a href="{% url 'schools:list' %}">Back to List</a>
+<!-- Stakeholders sections -->
+<hr>
+    <h2>Stakeholders list</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Stakeholder Name</th>
+                <th>Position</th>
+                <th>Phone Number</th>
+                <th>Optional</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stakeholder in stakeholders %}
+                <tr>
+                    <td>{{ stakeholder.stakeholder_name }}</td>
+                    <td>{{ stakeholder.position }}</td>
+                    <td>{{ stakeholder.contact_phone }}</td>
+                    <td>{{ stakeholder.email }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No Stakeholder available for this school. <a href="{% url 'schools:stakeholder_create' school.pk %}">Add Stakeholder list here.</a> </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+      <a style="margin: 1rem 2rem; display: inline-block;" href="{% url 'schools:stakeholder_create' school.pk %}">Add Stakeholder list here.</a>
+
+  <style>
+      a { padding: .51rem; margin: 1rem; text-decoration:none; background: green; color: white;  border-radius:4px; display: inline-block; }
+  </style>
+  <hr>
+   <div style="margin-top: 2rem; background: #efefef;">
+       <a href="{% url 'schools:list' %}">Back to List</a>
   <a href="{% url 'schools:delete' school.pk %}">Delete</a>
   <a href="{% url 'schools:update' school.pk %}">Edit</a>
+  
+   </div>
 {% endblock %}

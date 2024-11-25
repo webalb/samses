@@ -24,9 +24,13 @@ class TermAdmin(admin.ModelAdmin):
     third_term.short_description = 'Third Term'
 
 class SchoolAdmin(admin.ModelAdmin):
-    list_display = ('school_number', 'name', 'school_type', 'program', 'logo')
+    list_display = ('registration_number', 'name', 'school_type', 'program', 'logo')
     list_filter = ('school_type',)
     search_fields = ('name',)
+
+    # Add custom form field for "Generate" button
+    class Media:
+        js = ('js/school_admin.js',)  # Link to external JS file
 
 class SubjectAdmin(admin.ModelAdmin):
     list_display = ('subject_name', 'program', 'is_general', 'is_optional', 'school')

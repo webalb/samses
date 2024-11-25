@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %} Academic session lists {% endblock %}
+{% block style %}
+  table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+  th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+  }
+  th {
+      background-color: #f2f2f2;
+      text-align: left;
+  }
+  .col-span {
+      grid-column: span 2;
+  }
+{% endblock %}
+{% block content %}
+  <h1>Student List</h1>
+
+  <a class="btn-add" href="{% url 'students:create' %}">Add new student</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Admission Number</th>
+                <th>Full Name</th>
+                <th>School</th>
+                <th>Program</th>
+                <th>Current Level</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.admission_number }}</td>
+                <td>{{ student.get_full_name }}</td>
+                <td>{{ student.school.name }}</td>
+                <td>{{ student.program }}</td>
+                <td>{{ student.get_current_level_display }}</td>
+                <td style="display: flex; gap: 10px; padding: 10px; align-items:center">
+                    <a class="btn" href="{% url 'students:details' student.pk %}">Details</a>
+                    <a class="btn" href="{% url 'students:delete' student.pk %}">Delete</a>
+                    <a class="btn" href="{% url 'students:update' student.pk %}">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

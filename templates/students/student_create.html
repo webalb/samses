@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{% if form.instance.pk %}Update{% else %}create{% endif %} Student {% endblock %}
+
+{% block content %}
+  <h2>{% if form.instance.pk %}Update/Edit{% else %}New{% endif %} Student</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
+  </form>
+  <a href="{% url 'students:list' %}">Back to Students</a>
+  
+  <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const programField = document.getElementById('id_program');
+            const currentLevelField = document.getElementById('id_current_level');
+        
+            const levelChoices = {
+                'primary': [
+                    { value: '1', text: 'Primary 1' },
+                    { value: '2', text: 'Primary 2' },
+                    { value: '3', text: 'Primary 3' },
+                    { value: '4', text: 'Primary 4' },
+                    { value: '5', text: 'Primary 5' },
+                    { value: '6', text: 'Primary 6' },
+                ],
+                'jss': [
+                    { value: '7', text: 'JSS 1' },
+                    { value: '8', text: 'JSS 2' },
+                    { value: '9', text: 'JSS 3' },
+                ],
+                'sss': [
+                    { value: '10', text: 'SSS 1' },
+                    { value: '11', text: 'SSS 2' },
+                    { value: '12', text: 'SSS 3' },
+                ],
+            };
+        
+            function updateCurrentLevelOptions() {
+                const selectedProgram = programField.value;
+                const options = levelChoices[selectedProgram] || [];
+        
+                currentLevelField.innerHTML = '';  // Clear existing options
+        
+                options.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.value;
+                    optionElement.text = option.text;
+                    currentLevelField.add(optionElement);
+                });
+            }
+        
+            programField.addEventListener('change', updateCurrentLevelOptions);
+        
+            // Call the function on page load to set the initial state
+            updateCurrentLevelOptions();
+        });
+        
+  </script>
+  {% endblock %}
+

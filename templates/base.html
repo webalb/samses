@@ -6,10 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     <style>{% block style %}{% endblock %}</style>
-    
+    <style>
+        tr, th, thead, tbody, td { border: solid 1px #aaa; padding: 7px 10px }
+        
+        tr:even { background: #dfdfdf }
+    </style>
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
-<body>
+<body> 
     <div id="header">
         <span class="logo">SecureEduSert</span>
         {% if request.user.is_authenticated %}
@@ -45,7 +49,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function(){
+        /*$(document).ready(function(){
             function toggleSchoolField() {
                 if ($('#id_school_type').val() === 'individual') {
                     $('#id_school').prop('disabled', false);
@@ -62,7 +66,7 @@
             $('#id_school_type').change(function() {
                 toggleSchoolField();
             });
-        });
+        });*/
     </script>
 </body>
 </html>

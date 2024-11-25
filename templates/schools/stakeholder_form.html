@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %} Stakeholder {% if form.instance.pk %}Update{% else %}create{% endif %} {% endblock %}
+
+{% block content %}
+  <h4>{% if form.instance.pk %}Edit {{ stakeholder.stakeholder_name }} Stakeholder @ {{ stakeholder.school.name }} or add <a href="{% url 'schools:stakeholder_create' school.pk %}">New STakeholder</a>
+ {% else %}Add New Stakeholder in {{ school.name }}{% endif %}  </h4>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-control" style="margin: 1rem;">
+      {{ form.school.errors }}
+      <h2> {{ school.name }} </h2>
+      <input type="hidden" name="{{ form.school.name }}" value="{{ school.id }}" id="{{ form.school.id_for_label }}">
+    </div>
+    <div class="form-control" style="margin: 1rem;">
+      {{ form.stakeholder_name.errors }}
+      <label for="{{ form.stakeholder_name.id_for_label }}">Name</label>
+      {{ form.stakeholder_name }}
+    </div>
+    <div class="form-control" style="margin: 1rem;">
+      {{ form.position.errors }}
+      <label for="{{ form.position.id_for_label }}">Position</label>
+      {{ form.position }}
+    </div>
+    <div class="form-control" style="margin: 1rem;">
+      {{ form.contact_phone.errors }}
+      <label for="{{ form.contact_phone.id_for_label }}">Phone number</label>
+      {{ form.contact_phone }}
+    </div>
+    <div class="form-control" style="margin: 1rem;">
+      {{ form.email.errors }}
+      <label for="{{ form.email.id_for_label }}">Email</label>
+      {{ form.email }}
+    </div>
+
+    <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
+  </form>
+  <div style="margin: 2rem;">
+    <table>
+      <thead>
+        <tr>
+          <th>Stakeholder name</th>
+          <th>Position</th>
+          <th>Phone number</th>
+          <th>Email</th>
+          <th>School</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stakeholder in stakeholders %}
+          <tr>
+            <td>{{ stakeholder.stakeholder_name }}</td>
+            <td> {{ stakeholder.position }} </td>
+            <td> {{ stakeholder.contact_phone }} </td>
+            <td> {{ stakeholder.email }} </td>
+            <td> {{ stakeholder.school.name }} </td>
+            <td colspan="2">
+              <a href="{% url 'schools:stakeholder_update' stakeholder.id %}">Edit</a> | 
+              <a href="{% url 'schools:stakeholder_delete' stakeholder.id %}">Delete</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <a href="{% url 'schools:details' school.pk %}">Back to School Detail</a>
+{% endblock %}

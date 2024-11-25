@@ -1,5 +1,6 @@
 from django import template
 import math
+import datetime
 
 register = template.Library()
 
@@ -24,3 +25,11 @@ def readable_day_count(day_count):
         return f"{months} months"
     else:
         return f"{months} months, {days} days"
+
+@register.simple_tag
+def max_days(date_to, date_from):
+    return (date_to - date_from).days
+    
+@register.simple_tag 
+def days_attained(date_from):
+    return (datetime.date.today() - date_from).days

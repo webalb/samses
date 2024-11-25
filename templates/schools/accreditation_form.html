@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}  {% if form.instance.pk %}Update{% else %}create{% endif %} Accreditation status {% endblock %}
+{% block content %}
+<h2>{% if form.instance.pk %}Update/Edit{% else %}Set{% endif %} Accreditation status for {{ school.name }} </h2>
+<form method="post">
+    {% csrf_token %}
+    <p>
+        <input type="hidden" name="{{ form.school.html_name }}" value="{{ school.id }}" id="{{ form.school.id_for_label }}">
+    </p>
+    <div class="form-control" style="margin: 1rem;">
+        {{ form.status.errors }}
+        <label for="{{ form.status.id_for_label }}">Accreditation status:</label>
+        {{ form.status }}
+    </div>
+    <div class="form-control" style="margin: 1rem;">
+        {{ form.valid_from.errors }}
+        <label for="{{ form.valid_from.id_for_label }}">Valid from:</label>
+        {{ form.valid_from }}
+    </div>
+    <div class="form-control" style="margin: 1rem;">
+        {{ form.valid_to.errors }}
+        <label for="{{ form.valid_to.id_for_label }}">Valid to:</label>
+        {{ form.valid_to }}
+    </div>
+
+    
+    <button type="submit">{% if form.instance.pk %}Update{% else %}Set{% endif %}</button>
+</form>
+<a href="{% url 'schools:details' school.pk %}">Back to School details</a>
+{% endblock %}

@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from itertools import zip_longest
 
-from .forms import SchoolForm, AcademicSessionForm, SubjectForm, TermForm
-from .models import School, AcademicSession, Subject, Term
+from .forms import SchoolForm, AcademicSessionForm, SubjectForm, TermForm, StakeholderForm
+from .models import School, AcademicSession, Subject, Term,Stakeholder
 
 """
 ====================================
@@ -55,10 +55,13 @@ def school_details(request, pk):
     school = get_object_or_404(School, pk=pk)
     academic_session = school.get_academic_session()
     subjects = school.get_subjects()
+    stakeholders = school.stakeholders.all()
+
     context = {
         'school': school,
         'academic_session': academic_session,
         'subjects': subjects,
+        'stakeholders': stakeholders,
     }
     return render(request, 'schools/school_details.html', context)
 
@@ -229,3 +232,249 @@ def subject_delete(request, pk):
         subject.delete()
         return redirect('schools:subject_list')
     return render(request, 'schools/subject_confirm_delete.html', {'subject': subject})
+
+
+"""
+====================================
+|  VIEWS FOR HANDLING Stakeholder MODEL|
+|                                  |
+| Remained: adding user permission |
+|           to allow only ministry |
+|           admin and school admins to manupulate the|
+|           stakeholder model.          |
+====================================
+"""
+
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, UpdateView, DeleteView
+
+
+@login_required
+def stakeholder_create(request, pk):
+    school = get_object_or_404(School, pk=pk)
+    if request.method == 'POST':
+        form = StakeholderForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Stakeholder added successfully!')
+            form = StakeholderForm()
+            stakeholders = Stakeholder.objects.filter(school=school.id)
+            return render(request, 'schools/stakeholder_form.html', {'form': form, 'stakeholders': stakeholders, 'school': school})
+    else:
+        form = StakeholderForm()
+    stakeholders = Stakeholder.objects.filter(school=school.id)
+    return render(request, 'schools/stakeholder_form.html', {'form': form, 'stakeholders': stakeholders, 'school': school})
+
+
+@login_required
+def stakeholder_update(request, pk):
+    stakeholder = get_object_or_404(Stakeholder, pk=pk)
+    if request.method == "POST":
+        form = StakeholderForm(request.POST, instance=stakeholder)
+        if form.is_valid():
+            form.save()
+            print("Stakeholder %s updated successfully!" % stakeholder.stakeholder_name)
+            messages.success(request, 'Stakeholder updated successfully!')
+            form = StakeholderForm()
+            stakeholders = Stakeholder.objects.filter(school=stakeholder.school.id)
+            return render(request, 'schools/stakeholder_form.html', {'form': form, 'stakeholders': stakeholders, 'school': stakeholder.school})
+    form = StakeholderForm(instance=stakeholder)
+    stakeholders = Stakeholder.objects.filter(school=stakeholder.school.id)
+    context =  {'form': form, 'stakeholders': stakeholders, 'school': stakeholder.school, 'stakeholder': stakeholder}
+    return render(request, 'schools/stakeholder_form.html', context)
+
+@login_required
+def stakeholder_delete(request, pk):
+    stakeholder = get_object_or_404(Stakeholder, pk=pk)
+    if request.method == "POST":
+        stakeholder.delete()
+        return redirect('schools:stakeholder_create', pk=stakeholder.school.id)
+    return render(request, 'schools/stakeholder_confirm_delete.html', {'stakeholder': stakeholder})
+
+"""
+====================================
+|VIEWS FOR SchoolMetadata MODEL    |
+|                                  |
+| Remained: adding user permission |
+|           to allow only ministry |
+|           admin to manupulate the|
+|           Metadata model.        |
+====================================
+"""
+from schools.forms import SchoolMetadataForm
+from schools.models import SchoolMetadata
+@login_required
+def metadata_set(request, pk):
+    school = get_object_or_404(School, pk=pk,)
+    if request.POST:
+        form = SchoolMetadataForm(request.POST, initial={'school': school.pk})
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Metadata set successfully!")
+            return redirect('schools:details', pk=pk)
+    else:
+        form = SchoolMetadataForm()
+    return render(request, 'schools/metadata_form.html', {'form': form, 'school': school})
+
+@login_required
+def metadata_update(request, pk):
+    metadata = get_object_or_404(SchoolMetadata, pk=pk)
+    if request.POST:
+        form = SchoolMetadataForm(request.POST, instance=metadata)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Metadata updated successfully.")
+            return redirect("schools:details", pk=metadata.school.pk)
+    form = SchoolMetadataForm(instance=metadata)
+    return render(request, "schools/metadata_form.html", {'form': form, 'school': metadata.school })
+
+@login_required
+def metadata_delete(request, pk):
+    metadata = get_object_or_404(SchoolMetadata, pk=pk)
+    if request.POST:
+        metadata.delete()
+        return redirect("schools:details", pk=metadata.school.pk)
+    return render(request, 'schools/metadata_confirm_delete.html', {'metadata': metadata})
+
+"""
+====================================
+|VIEWS FOR Accreditation status MODEL    |
+|                                  |
+| Remained: adding user permission |
+|           to allow only ministry |
+|           admin to manupulate the|
+|           Metadata model.        |
+====================================
+"""
+from schools.models import AccreditationStatus
+from schools.forms import AccreditationForm
+
+@login_required
+def accreditation_set(request, pk):
+    school = get_object_or_404(School, pk=pk)
+    if request.POST:
+        form = AccreditationForm(request.POST,)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Accreditation set successfully for this school.")
+            return redirect("schools:details", pk=pk)
+        else:
+            return render(request, "schools/accreditation_form.html", {'form': form, 'school': school})
+
+
+    form = AccreditationForm()
+    return render(request, "schools/accreditation_form.html", {'form': form, 'school': school})
+
+@login_required
+def accreditation_update(request, pk):
+    accr = get_object_or_404(AccreditationStatus, pk=pk)
+    if request.POST:
+        form = AccreditationForm(request.POST, instance=accr, initial={'school': school.pk})
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Accreditation updated successfully for this school")
+            return redirect("schools:details", pk=accr.school.pk)
+    form = AccreditationForm(instance=accr)
+    return render(request, "schools/accreditation_form.html", {'form': form,'school': accr.school})
+@login_required
+def accreditation_delete(request, pk):
+    accr = get_object_or_404(AccreditationStatus, pk=pk)
+    if request.POST:
+        accr.delete()
+        return redirect("schools:details", pk=accr.school.pk)
+    return render(request, 'schools/accreditation_confirm_delete.html', {'accreditation': accr})
+
+"""
+====================================
+|VIEWS FOR Suspension closure MODEL|
+|                                  |
+| Remained: adding user permission |
+|           to allow only ministry |
+|           admin to manupulate the|
+|            model.        |
+====================================
+"""
+from schools.models import SuspensionClosure
+from schools.forms import SuspensionForm
+@login_required
+def suspension_set(request, pk):
+    school = get_object_or_404(School, pk=pk)
+    if request.POST:
+        form = SuspensionForm(request.POST,)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "School suspended successfully.")
+            return redirect("schools:details", pk=pk)
+        else:
+            return render(request, "schools/suspension_form.html", {'form': form, 'school': school})
+
+
+    form = SuspensionForm()
+    return render(request, "schools/suspension_form.html", {'form': form, 'school': school})
+
+@login_required
+def suspension_update(request, pk):
+    suspension = get_object_or_404(SuspensionClosure, pk=pk)
+    if request.POST:
+        form = SuspensionForm(request.POST, instance=suspension, initial={'school': school.pk})
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Suspension updated successfully for this school")
+            return redirect("schools:details", pk=suspension.school.pk)
+    form = SuspensionForm(instance=accr)
+    return render(request, "schools/suspension_form.html", {'form': form,'school': suspension.school})
+@login_required
+def suspension_delete(request, pk):
+    suspension = get_object_or_404(SuspensionClosure, pk=pk)
+    if request.POST:
+        suspension.delete()
+        return redirect("schools:details", pk=suspension.school.pk)
+    return render(request, 'schools/suspension_confirm_delete.html', {'suspension': suspension})
+
+"""
+====================================
+|VIEWS FOR inspection report MODEL |
+|                                  |
+| Remained: adding user permission |
+|           to allow only ministry |
+|           admin to manupulate the|
+|            model.        |
+====================================
+"""
+from schools.models import InspectionReport
+from schools.forms import InspectionReportForm
+@login_required
+def inspection_report_set(request, pk):
+    school = get_object_or_404(School, pk=pk)
+    if request.POST:
+        form = InspectionReportForm(request.POST,)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Inspection report added successfully.")
+            return redirect("schools:details", pk=pk)
+        else:
+            return render(request, "schools/inspection_report_form.html", {'form': form, 'school': school})
+
+
+    form = InspectionReportForm()
+    return render(request, "schools/inspection_report_form.html", {'form': form, 'school': school})
+
+@login_required
+def inspection_report_update(request, pk):
+    inspection_report = get_object_or_404(InspectionReport, pk=pk)
+    if request.POST:
+        form = InspectionReportForm(request.POST, instance=inspection_report, initial={'school': school.pk})
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Inspection report updated successfully for this school")
+            return redirect("schools:details", pk=inspection_report.school.pk)
+    form = InspectionReportForm(instance=accr)
+    return render(request, "schools/inspection_report_form.html", {'form': form,'inspection_report': inspection_report.school})
+@login_required
+def inspection_report_delete(request, pk):
+    inspection_report = get_object_or_404(SuspensionClosure, pk=pk)
+    if request.POST:
+        inspection_report.delete()
+        return redirect("schools:details", pk=inspection_report.school.pk)
+    return render(request, 'schools/inspection_report_confirm_delete.html', {'inspection_report': inspection_report})

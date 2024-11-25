@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} School Accreditation Information delete delete {% endblock %}
+
+{% block content %}
+  <h2>Delete School Accreditation Information</h2>
+  <p>Are you sure you want to delete accreditation information for <b>{{ metadata.school.name }}</b> from this server?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="{% url 'schools:list' %}">Cancel</a>
+  </form>
+{% endblock %}
