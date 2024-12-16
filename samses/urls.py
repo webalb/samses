@@ -25,7 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/', include('users.urls', namespace='users')),
     path('schools/', include('schools.urls', namespace='schools')),
-    path('students/', include('students.urls', namespace='students')),
+    # path('students/', include('students.urls', namespace='students')),
     path('social-auth/', include('social_django.urls', namespace='social')),
     # path('accounts/', include('django.contrib.auth.urls')),
 ]

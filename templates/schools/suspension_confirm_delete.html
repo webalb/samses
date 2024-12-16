@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} Drop Suspension {% endblock %}
+
+{% block content %}
+  <h2>Drop Suspension</h2>
+  <p>Are you sure you want to drop the Suspension on {{ school.name }}?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="{% url 'schools:list' %}">Cancel</a>
+  </form>
+{% endblock %}

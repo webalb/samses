@@ -1,119 +1,120 @@
 {% extends "base.html" %}
 {% block title %} Subject lists {% endblock %}
-{% block style %}
-  table {
-      width: 100%;
-      border-collapse: collapse;
-  }
-  th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-  }
-  th {
-      background-color: #f2f2f2;
-      text-align: left;
-  }
-  .col-span {
-      grid-column: span 2;
-  }
-{% endblock %}
 {% block content %}
-  <h2>Subjects</h2>
-  <a href="{% url 'schools:subject_create' %}">Add New Subject</a>
-  <table>
-    <thead>
-        <tr style="text-align: center;">
-            <th colspan="3">Primary</th>
-            <th colspan="3">Junior Secondary School</th>
-            <th colspan="3">Senior Secondary School</th>
-        </tr>
-        <tr>
-            <th>Subject Name</th>
-            <th>General/Specific</th>
-            <th>Optional</th>
-            <th>Subject Name</th>
-            <th>General/Specific</th>
-            <th>Optional</th>
-            <th>Subject Name</th>
-            <th>General/Specific</th>
-            <th>Optional</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for primary_subject, jss_subject, sss_subject in subject_rows %}
-        <tr>
-            <td>
-                {% if primary_subject %}
-                    {{ primary_subject.subject_name }}
-                {% endif %}
-            </td>
-            <td>
-                {% if primary_subject %}
-                    {% if primary_subject.is_general %}
-                        General
-                    {% else %}
-                        Specific
-                    {% endif %}
-                {% endif %}
-            </td>
-            <td>
-                {% if primary_subject %}
-                    {% if primary_subject.is_optional %}
-                        Yes
-                    {% else %}
-                        No
-                    {% endif %}
-                {% endif %}
-            </td>
-            <td>
-                {% if jss_subject %}
-                    {{ jss_subject.subject_name }}
-                {% endif %}
-            </td>
-            <td>
-                {% if jss_subject %}
-                    {% if jss_subject.is_general %}
-                        General
-                    {% else %}
-                        Specific
-                    {% endif %}
-                {% endif %}
-            </td>
-            <td>
-                {% if jss_subject %}
-                    {% if jss_subject.is_optional %}
-                        Yes
-                    {% else %}
-                        No
-                    {% endif %}
-                {% endif %}
-            </td>
-            <td>
-                {% if sss_subject %}
-                    {{ sss_subject.subject_name }}
-                {% endif %}
-            </td>
-            <td>
-                {% if sss_subject %}
-                    {% if sss_subject.is_general %}
-                        General
-                    {% else %}
-                        Specific
-                    {% endif %}
-                {% endif %}
-            </td>
-            <td>
-                {% if sss_subject %}
-                    {% if sss_subject.is_optional %}
-                        Yes
-                    {% else %}
-                        No
-                    {% endif %}
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+  <div class="container my-4">
+    <h2 class="mb-4">Subjects</h2>
+
+    <!-- Add New Subject Button -->
+    <a href="{% url 'schools:subject_create' %}" class="btn btn-success mb-4">
+        Add New Subject
+    </a>
+
+    <!-- Subjects Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-dark">
+                <tr style="text-align: center;">
+                    <th colspan="4">Primary</th>
+                    <th colspan="4">Junior Secondary School</th>
+                    <th colspan="4">Senior Secondary School</th>
+                </tr>
+                <tr>
+                    <th>Subject Name</th>
+                    <th>General/Specific</th>
+                    <th>Optional</th>
+                    <th>Actions</th>
+                    <th>Subject Name</th>
+                    <th>General/Specific</th>
+                    <th>Optional</th>
+                    <th>Actions</th>
+                    <th>Subject Name</th>
+                    <th>General/Specific</th>
+                    <th>Optional</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for primary_subject, jss_subject, sss_subject in subject_rows %}
+                    <tr>
+                        {% if primary_subject %}
+                                <td>{{ primary_subject.subject_name }}</td>
+
+                                <td>
+                                    {% if primary_subject.is_general %}
+                                        General
+                                    {% else %}
+                                        Specific to <a href="{% url 'schools:details' primary_subject.school.id %}"> {{ primary_subject.school.abbreviation }}</a>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                        {% if primary_subject.is_optional %}
+                                            Yes
+                                        {% else %}
+                                            No
+                                        {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center allign-items-center gap-2">
+                                        <a class='btn btn-primary' href="{% url 'schools:subject_update' primary_subject.id %}">Edit</a>
+                                        <a class='btn btn-danger' href="{% url 'schools:subject_delete' primary_subject.id %}">Del</a>
+                                    </div>
+                                </td>
+
+                        {% endif %}
+                        {% if jss_subject %}
+
+                            <td>{{ jss_subject.subject_name }}</td>
+                            <td>
+                                {% if jss_subject.is_general %}
+                                    General
+                                {% else %}
+                                    Specific to <a href="{% url 'schools:details' jss_subject.school.id %}"> {{ jss_subject.school.abbreviation }}</a>                   
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if jss_subject.is_optional %}
+                                    Yes
+                                {% else %}
+                                    No
+                                {% endif %}
+                            </td>
+                             <td>
+                                <div class="d-flex justify-content-center allign-items-center gap-2">
+                                    <a class='btn btn-primary' href="{% url 'schools:subject_update' primary_subject.id %}">Edit</a>
+                                    <a class='btn btn-danger' href="{% url 'schools:subject_delete' primary_subject.id %}">Del</a>
+                                </div>
+                            </td>
+                        {% endif %}
+                        {% if sss_subject %}
+                            <td>{{ sss_subject.subject_name }}</td>
+                            <td>
+                                {% if sss_subject %}
+                                    {% if sss_subject.is_general %}
+                                        General
+                                    {% else %}
+                                        Specific to <a href="{% url 'schools:details' sss_subject.school.id %}"> {{ sss_subject.school.abbreviation }}</a>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                    {% if sss_subject.is_optional %}
+                                        Yes
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                            </td>
+                             <td>
+                                <div class="d-flex justify-content-center allign-items-center gap-2">
+                                    <a class='btn btn-primary' href="{% url 'schools:subject_update' primary_subject.id %}">Edit</a>
+                                    <a class='btn btn-danger' href="{% url 'schools:subject_delete' primary_subject.id %}">Del</a>
+                                </div>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
 {% endblock %}

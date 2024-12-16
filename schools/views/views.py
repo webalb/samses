@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from itertools import zip_longest
+from django.views.generic.edit import FormView
 
-from .forms import SchoolForm, AcademicSessionForm, SubjectForm, TermForm, StakeholderForm
-from .models import School, AcademicSession, Subject, Term,Stakeholder
+from schools.forms import SchoolForm, AcademicSessionForm, SubjectForm, TermForm, StakeholderForm
+from schools.models import School, AcademicSession, Subject, Term, Stakeholder, Classrooms, SchoolImages
 
 """
 ====================================
@@ -16,18 +17,22 @@ from .models import School, AcademicSession, Subject, Term,Stakeholder
 |           school model.          |
 ====================================
 """
+
 @login_required
 def school_create(request):
     if request.method == 'POST':
         form = SchoolForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            new_school = form.save(commit=False)  # Don't save to the database yet
+            new_school.pk = None  # Explicitly set the pk to None, so it's a new object
+            new_school.save()  # Now save it, and Django will generate the pk
             messages.success(request, 'School created successfully!')  # Display success message
-            return redirect('schools:list')
+            return redirect('schools:details', pk=new_school.pk)
         else:
             messages.error(request, 'Something bad happens, please review the data you provided')  # Display success message
     else:
         form = SchoolForm()
+        form.instance.pk = None
     return render(request, 'schools/school_create.html', {'form': form})
 
 @login_required
@@ -54,14 +59,18 @@ def school_list(request):
 def school_details(request, pk):
     school = get_object_or_404(School, pk=pk)
     academic_session = school.get_academic_session()
-    subjects = school.get_subjects()
     stakeholders = school.stakeholders.all()
+    classroom = Classrooms.objects.filter(school=school).order_by('-created_at').first()  # Expecting only one record
 
+    # Fetch images grouped by type
+    classroom_images = SchoolImages.objects.filter(school=school, image_type='classroom').order_by('-created_at')[:3]
+   
     context = {
         'school': school,
         'academic_session': academic_session,
-        'subjects': subjects,
         'stakeholders': stakeholders,
+        'classroom': classroom,
+        'classroom_images': classroom_images,
     }
     return render(request, 'schools/school_details.html', context)
 
@@ -217,12 +226,12 @@ def subject_list(request):
 def subject_update(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     if request.method == "POST":
-        form = SubjectForm(request.POST, instance=subject, user=request.user)
+        form = SubjectForm(request.POST, instance=subject,)
         if form.is_valid():
             form.save()
             return redirect('schools:subject_list')
     else:
-        form = SubjectForm(instance=subject, user=request.user)
+        form = SubjectForm(instance=subject,)
     return render(request, 'schools/subject_create.html', {'form': form})
 
 @login_required
@@ -308,13 +317,13 @@ from schools.models import SchoolMetadata
 def metadata_set(request, pk):
     school = get_object_or_404(School, pk=pk,)
     if request.POST:
-        form = SchoolMetadataForm(request.POST, initial={'school': school.pk})
+        form = SchoolMetadataForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Metadata set successfully!")
             return redirect('schools:details', pk=pk)
     else:
-        form = SchoolMetadataForm()
+        form = SchoolMetadataForm(initial={'school': school})
     return render(request, 'schools/metadata_form.html', {'form': form, 'school': school})
 
 @login_required
@@ -339,7 +348,7 @@ def metadata_delete(request, pk):
 
 """
 ====================================
-|VIEWS FOR Accreditation status MODEL    |
+|VIEWS FOR Accreditation status MODEL|
 |                                  |
 | Remained: adding user permission |
 |           to allow only ministry |
@@ -425,10 +434,12 @@ def suspension_update(request, pk):
     form = SuspensionForm(instance=accr)
     return render(request, "schools/suspension_form.html", {'form': form,'school': suspension.school})
 @login_required
-def suspension_delete(request, pk):
+def suspension_drop(request, pk):
     suspension = get_object_or_404(SuspensionClosure, pk=pk)
     if request.POST:
-        suspension.delete()
+        suspension.is_dropped = True
+        suspension.save()
+        messages.success(request, "Suspension dropped successfully for this school")
         return redirect("schools:details", pk=suspension.school.pk)
     return render(request, 'schools/suspension_confirm_delete.html', {'suspension': suspension})
 
@@ -464,16 +475,16 @@ def inspection_report_set(request, pk):
 def inspection_report_update(request, pk):
     inspection_report = get_object_or_404(InspectionReport, pk=pk)
     if request.POST:
-        form = InspectionReportForm(request.POST, instance=inspection_report, initial={'school': school.pk})
+        form = InspectionReportForm(request.POST, instance=inspection_report,)
         if form.is_valid():
             form.save()
             messages.success(request, "Inspection report updated successfully for this school")
             return redirect("schools:details", pk=inspection_report.school.pk)
-    form = InspectionReportForm(instance=accr)
-    return render(request, "schools/inspection_report_form.html", {'form': form,'inspection_report': inspection_report.school})
+    form = InspectionReportForm(instance=inspection_report)
+    return render(request, "schools/inspection_report_form.html", {'form': form,'school': inspection_report.school})
 @login_required
 def inspection_report_delete(request, pk):
-    inspection_report = get_object_or_404(SuspensionClosure, pk=pk)
+    inspection_report = get_object_or_404(InspectionReport, pk=pk)
     if request.POST:
         inspection_report.delete()
         return redirect("schools:details", pk=inspection_report.school.pk)

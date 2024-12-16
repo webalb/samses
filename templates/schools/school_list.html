@@ -2,11 +2,83 @@
 {% block title %} School lists {% endblock %}
 
 {% block content %}
-  <h2>Schools</h2>
-  <a href="{% url 'schools:create' %}">Add New School</a>
-  <ul>
-    {% for school in schools %}
-      <li><a href="{% url 'schools:details' school.pk %}">{{ school.name }}</a></li>
-    {% endfor %}
-  </ul>
+<div class="container my-4">
+    <h2 class="mb-4">Schools</h2>
+
+    <!-- Add New School Button -->
+    <a href="{% url 'schools:create' %}" class="btn btn-success mb-4">
+        Add New School
+    </a>
+
+    <!-- List of Schools -->
+    {% if schools %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Logo</th>
+                        <th>School Name</th>
+                        <th>Motto</th>
+                        <th>Phone Number</th>
+                        <th>Website</th>
+                        <th>Registration Number</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for school in schools %}
+                        <tr>
+                            <!-- School Logo -->
+                            <td class="text-center">
+                                {% if school.logo %}
+                                    <img src="{{ school.logo.url }}" alt="{{ school.name }} Logo" class="img-fluid rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                    <span class="text-muted">No Logo</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- School Name -->
+                            <td>{{ school.name }}</td>
+
+                            <!-- Motto -->
+                            <td>{{ school.motto }}</td>
+
+                            <!-- Phone Number -->
+                            <td>
+                                {% if school.phone %}
+                                    <a href="tel:{{ school.phone }}">{{ school.phone }}</a>
+                                {% else %}
+                                    <span class="text-muted">Not Available</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Website -->
+                            <td>
+                                {% if school.website %}
+                                    <a href="{{ school.website }}" target="_blank">{{ school.website }}</a>
+                                {% else %}
+                                    <span class="text-muted">Not Available</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- School Registration Number -->
+                            <td>{{ school.registration_number }}</td>
+
+                            <!-- Details Link -->
+                            <td class="text-center">
+                                <a href="{% url 'schools:details' school.pk %}" class="btn btn-primary btn-sm">
+                                    View Details
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            No schools found.
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

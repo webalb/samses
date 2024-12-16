@@ -3,166 +3,565 @@
 {% load custom_filters %}
 
 {% block content %}
-<center>
-<p>
-  {% if school.logo %}
-    <img width="100" height="100" src="{{ school.logo.url }}" alt="{{ school.name }} Logo">
-  {% else %}
-    <p>No logo available.</p>
-  {% endif %}
-</p> 
-
-  <h2>{{ school.name|upper }} {% if school.abbreviation %} ({{school.abbreviation}}) {% endif %}</h2>
-  <p> <span style="color: red">Motto:</span> {{ school.motto }} </p>
-
-</center>
-<hr>
-  <p> <b>Scool registration Number: </b>{{ school.registration_number }} </p>
-  <p><b>School Acreditation Number:</b> 
-    {% if school.get_current_accreditation %}
-        {% with accr=school.get_current_accreditation %}
-            {{ accr.accreditation_number }}
-        {% endwith %}
+<div class="text-center my-4">
+    <!-- School Logo -->
+    {% if school.logo %}
+        <img src="{{ school.logo.url }}" alt="{{ school.name }} Logo" class="rounded-circle mb-3" width="100" height="100">
+    {% else %}
+        <p class="text-muted">No logo available.</p>
     {% endif %}
-  </p>
-  <p>Type: {{ school.get_school_type_display }}</p>
-  <p>Established on: {{ school.established_date }}</p>
 
-  <h4>Address:</h4>
-  <p>LGA: {{ school.lga }}</p>
-  <p>{% if school.city %} City: {{school.city}} {% endif %}</p>
-  <p>Ward: {{ school.ward }}</p>
-  <p>Street Address: {{ school.street_address }}</p>
+    <!-- School Name and Abbreviation -->
+    <h2 class="text-uppercase">{{ school.name }}</h2>
+    {% if school.abbreviation %}
+        <h5 class="text-muted">({{ school.abbreviation }})</h5>
+    {% endif %}
 
-  <h4>Contact Info:</h4>
-  <p>Email: {{ school.email }}</p>
-  <p>Phone: {{ school.phone }}</p>
-  <p>Website: {{ school.website }}</p>
-  <p>Program: {{ school.get_program_display }}</p>
-    {% if academic_session %}
-      {% if academic_session.start_date <= today <= academic_session.end_date %}
-          <p>Academic session: <b> {{ academic_session.session_name }} </b> is ongoing and will end on {{ academic_session.end_date|date:"l, F d, Y" }}.</p>
-      {% elif today < academic_session.start_date %}
-          <p>Academic session: <b>{{ academic_session.session_name }}</b> will start on {{ academic_session.start_date|date:"l, F d, Y" }}.</p>
-      {% else %}
-          <p>Academic session: <b>{{ academic_session.session_name }}</b> ended on {{ academic_session.end_date|date:"l, F d, Y" }}.</p>
-      {% endif %}
-<hr>
-    <h4>Term Details:</h4>
-            {% if academic_session.term_dates %}
-                <ul>
-                    {% if academic_session.term_dates.start_date_1 %}
-                        <li>First Term: {{ academic_session.term_dates.start_date_1 }} - {{ academic_session.term_dates.end_date_1 }}</li>
-                    {% endif %}
-                    {% if academic_session.term_dates.start_date_2 %}
-                        <li>Second Term: {{ academic_session.term_dates.start_date_2 }} - {{ academic_session.term_dates.end_date_2 }}</li>
-                    {% endif %}
-                    {% if academic_session.term_dates.start_date_3 %}
-                        <li>Third Term: {{ academic_session.term_dates.start_date_3 }} - {{ academic_session.term_dates.end_date_3 }}</li>
-                    {% endif %}
-                </ul>
-            {% else %}
-                <p>No terms set for this school</p>
-                <a href="{% url 'schools:term_create_or_update' academic_session.id %}">Set Terms for this school's Academic Session</a>
+    <!-- School Motto -->
+    <p class="mt-3">
+        <span class="text-danger font-weight-bold">Motto:</span> {{ school.motto }}
+    </p>
+</div>
+
+<hr class="my-4">
+
+<div class="container my-4">
+    <!-- School Information Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4>School Information</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>School Registration Number:</strong> {{ school.registration_number }}</p>
+            <p><strong>School Accreditation Number:</strong> 
+                {% if school.get_current_accreditation %}
+                    {% with accr=school.get_current_accreditation %}
+                        {{ accr.accreditation_number }}
+                    {% endwith %}
+                {% else %}
+                    <span class="text-muted">Not available</span>
+                {% endif %}
+            </p>
+            <p><strong>Type:</strong> {{ school.get_school_type_display }}</p>
+            <p><strong>Established On:</strong> {{ school.established_date }}</p>
+            <p><strong>Status:</strong> {{ school.status }}</p>
+        </div>
+    </div>
+
+    <!-- Address Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h4>Address</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>LGA:</strong> {{ school.lga }}</p>
+            {% if school.city %}
+                <p><strong>City:</strong> {{ school.city }}</p>
             {% endif %}
-    {% else %}
-      <p>Academic session: No academic session is set.</p>
-    {% endif %}
+            <p><strong>Ward:</strong> {{ school.ward }}</p>
+            <p><strong>Street Address:</strong> {{ school.street_address }}</p>
+        </div>
+    </div>
 
-    <!-- Metadata section --><hr>
-    <h2>School Metadata</h2>
-    {% if school.schoolmetadata %}
-        <p> <b>Language of instruction:</b> {{ school.schoolmetadata.get_language_of_instruction_display }} </p>
-         <p> <b>Enrollment capacity:</b> {{ school.schoolmetadata.enrollment_capacity }} </p>
-         <a href="{% url 'schools:metadata_update' school.schoolmetadata.pk %}">Update Metadata for this school.</a> |
-            <a href="{% url 'schools:metadata_delete' school.schoolmetadata.pk %}">Delete Metadata for this school.</a> 
+    <!-- Contact Info Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h4>Contact Information</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Email:</strong> 
+                {% if school.email %}
+                    <a href="mailto:{{ school.email }}">{{ school.email }}</a>
+                {% else %}
+                    <span class="text-muted">Not available</span>
+                {% endif %}
+            </p>
+            <p><strong>Phone:</strong> 
+                {% if school.phone %}
+                    <a href="tel:{{ school.phone }}">{{ school.phone }}</a>
+                {% else %}
+                    <span class="text-muted">Not available</span>
+                {% endif %}
+            </p>
+            <p><strong>Website:</strong> 
+                {% if school.website %}
+                    <a href="{{ school.website }}" target="_blank">{{ school.website }}</a>
+                {% else %}
+                    <span class="text-muted">Not available</span>
+                {% endif %}
+            </p>
+            <p><strong>Program:</strong> {{ school.get_program_display }}</p>
+        </div>
+    </div>
+</div>
+
+<hr class="my-4">
+
+<div class="container my-4">
+    <h2 class="mb-4">Academic Calendar</h2>
+
+    {% if academic_session %}
+        <!-- Display the Current Academic Session Status -->
+        <div class="alert alert-info">
+            {% if academic_session.start_date <= today <= academic_session.end_date %}
+                <p>Academic session: <strong>{{ academic_session.session_name }}</strong> is ongoing and will end on <strong>{{ academic_session.end_date|date:"l, F d, Y" }}</strong>.</p>
+            {% elif today < academic_session.start_date %}
+                <p>Academic session: <strong>{{ academic_session.session_name }}</strong> will start on <strong>{{ academic_session.start_date|date:"l, F d, Y" }}</strong>.</p>
+            {% else %}
+                <p>Academic session: <strong>{{ academic_session.session_name }}</strong> ended on <strong>{{ academic_session.end_date|date:"l, F d, Y" }}</strong>.</p>
+            {% endif %}
+        </div>
+
+        <!-- Overall Academic Session Progress -->
+        <div class="progress mb-4" style="height: 20px;">
+            <div class="progress-bar bg-success" 
+                role="progressbar" 
+                style="width: {% days_attained academic_session.start_date %}%" 
+                aria-valuenow="{% days_attained academic_session.start_date %}" 
+                aria-valuemin="0" 
+                aria-valuemax="{% max_days academic_session.end_date academic_session.start_date %}">
+                Session Progress: {% days_attained academic_session.start_date %}
+            </div>
+        </div>
+
+        <!-- Term Details -->
+        <h4 class="mt-4">Term Details</h4>
+        {% if academic_session.term_dates %}
+            <div class="row">
+                <!-- First Term -->
+                {% if academic_session.term_dates.start_date_1 %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">First Term</h5>
+                                <p class="card-text">
+                                    {{ academic_session.term_dates.start_date_1|date:"F d, Y" }} - {{ academic_session.term_dates.end_date_1|date:"F d, Y" }}
+                                </p>
+                                <div class="progress" style="height: 15px;">
+                                    <div class="progress-bar bg-info" 
+                                        role="progressbar" 
+                                        style="width: {% days_attained academic_session.term_dates.start_date_1 %}" 
+                                        aria-valuenow="{% days_attained academic_session.term_dates.start_date_1 %}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="{% max_days academic_session.term_dates.end_date_1 academic_session.term_dates.start_date_1 %}">
+                                        {% days_attained academic_session.term_dates.start_date_1 %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Second Term -->
+                {% if academic_session.term_dates.start_date_2 %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Second Term</h5>
+                                <p class="card-text">
+                                    {{ academic_session.term_dates.start_date_2|date:"F d, Y" }} - {{ academic_session.term_dates.end_date_2|date:"F d, Y" }}
+                                </p>
+                                <div class="progress" style="height: 15px;">
+                                    <div class="progress-bar bg-info" 
+                                        role="progressbar" 
+                                        style="width: {% days_attained academic_session.term_dates.start_date_2 %}" 
+                                        aria-valuenow="{% days_attained academic_session.term_dates.start_date_2 %}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="{% max_days academic_session.term_dates.end_date_2 academic_session.term_dates.start_date_2 %}">
+                                        {% days_attained academic_session.term_dates.start_date_2 %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Third Term -->
+                {% if academic_session.term_dates.start_date_3 %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Third Term</h5>
+                                <p class="card-text">
+                                    {{ academic_session.term_dates.start_date_3|date:"F d, Y" }} - {{ academic_session.term_dates.end_date_3|date:"F d, Y" }}
+                                </p>
+                                <div class="progress" style="height: 15px;">
+                                    <div class="progress-bar bg-info" 
+                                        role="progressbar" 
+                                        style="width: {% days_attained academic_session.term_dates.start_date_3 %}" 
+                                        aria-valuenow="{% days_attained academic_session.term_dates.start_date_3 %}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="{% max_days academic_session.term_dates.end_date_3 academic_session.term_dates.start_date_3 %}">
+                                        {% days_attained academic_session.term_dates.start_date_3 %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="text-muted">No terms set for this school.</p>
+            <a href="{% url 'schools:term_create_or_update' academic_session.id %}" class="btn btn-primary">Set Terms</a>
+        {% endif %}
     {% else %}
-        <a href="{% url 'schools:metadata_set' school.pk %}">Set Metadata for this school.</a> 
+        <div class="alert alert-warning">
+            <p>Academic session: No academic session is set.</p>
+        </div>
     {% endif %}
+</div>
+
+<hr class="my-4">
+
+<div class="container my-4">
+    <h2 class="mb-4">School Metadata</h2>
+
+    {% if school.schoolmetadata %}
+        <!-- Metadata Details -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <p><strong>Language of Instruction:</strong> {{ school.schoolmetadata.get_language_of_instruction_display|default:"Not set" }}</p>
+                <p><strong>Enrollment Capacity:</strong> {{ school.schoolmetadata.enrollment_capacity|default:"Not set" }}</p>
+                <p><strong>Ownership Status:</strong> {{ school.schoolmetadata.ownership_status|default:"Not set" }}</p>
+                <p><strong>Owner Name:</strong> {{ school.schoolmetadata.owner|default:"Not set" }}</p>
+                <p><strong>Pass Rate:</strong> {{ school.schoolmetadata.pass_rate|default_if_none:"N/A" }}</p>
+                <p><strong>Graduation Rate:</strong> {{ school.schoolmetadata.graduation_rate|default_if_none:"N/A" }}</p>
+                <p><strong>Students Attendance Rate:</strong> {{ school.schoolmetadata.attendance_rate|default_if_none:"N/A" }}</p>
+                <p><strong>Discipline Rate:</strong> {{ school.schoolmetadata.discipline_rate|default_if_none:"N/A" }}</p>
+                <p><strong>Compliance Percentage:</strong> {{ school.schoolmetadata.compliance_percentage|default_if_none:"N/A" }}</p>
+            </div>
+        </div>
+
+        <!-- Action Links -->
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'schools:metadata_update' school.schoolmetadata.pk %}" class="btn btn-primary">
+                Update Metadata
+            </a>
+            <a href="{% url 'schools:metadata_delete' school.schoolmetadata.pk %}" class="btn btn-danger">
+                Delete Metadata
+            </a>
+        </div>
+    {% else %}
+        <!-- Set Metadata Link -->
+        <div class="alert alert-warning">
+            Metadata for this school is not set.
+        </div>
+        <a href="{% url 'schools:metadata_set' school.pk %}" class="btn btn-success">Set Metadata</a>
+    {% endif %}
+</div>
+
      <!-- Accreditation information section --><hr>
-    <h2>School Accreditation information</h2>
+   <div class="container my-4">
+    <h2 class="mb-4">School Accreditation Information</h2>
+
     {% if school.get_current_accreditation %}
         {% with accr=school.get_current_accreditation %}
-            <p> <b>Accreditation status:</b> {{ accr.get_status_display }} </p>
-            <p> <b>Valid From:</b> {{ accr.valid_from }} </p>
-            <p> <b>Valid To:</b> {{ accr.valid_to }} </p>
-            {% if accr.expired %}<p><strong>Acreditation expired</strong></p>{% endif %}
-            <progress max="{% max_days accr.valid_to accr.valid_from %}" value="{% days_attained accr.valid_from %}"></progress>
-             <a href="{% url 'schools:accreditation_set' school.pk %}">Take another action.</a> 
+            <!-- Current Accreditation Details -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p><strong>Accreditation Status:</strong> {{ accr.get_status_display }}</p>
+                    <p><strong>Valid From:</strong> {{ accr.valid_from|date:"F d, Y" }}</p>
+                    <p><strong>Valid To:</strong> {{ accr.valid_to|date:"F d, Y" }}</p>
+
+                    {% if accr.expired %}
+                        <div class="alert alert-danger">
+                            <strong>Accreditation expired</strong>
+                        </div>
+                    {% endif %}
+
+                    <!-- Progress Bar for Accreditation Validity -->
+                    <div class="progress mb-3" style="height: 20px;">
+                        <div class="progress-bar bg-success" 
+                            role="progressbar" 
+                            style="width: {% days_attained accr.valid_from %}%" 
+                            aria-valuenow="{% days_attained accr.valid_from %}" 
+                            aria-valuemin="0" 
+                            aria-valuemax="{% max_days accr.valid_to accr.valid_from %}">
+                            {% days_attained accr.valid_from %}%
+                        </div>
+                    </div>
+
+                    <a href="{% url 'schools:accreditation_set' school.pk %}" class="btn btn-primary">
+                        Take Another Action
+                    </a>
+                </div>
+            </div>
         {% endwith %}
+    
     {% elif school.recent_accreditation_status %}
         {% with accr=school.recent_accreditation_status %}
-            <p> <b>Status:</b> {{ accr.get_status_display }} </p>
-            <p> <b>Created on:</b> {{ accr.created_at }}</p>
-            <a href="{% url 'schools:accreditation_set' school.pk %}">Take another action.</a>
+            <!-- Recent Accreditation Status -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p><strong>Status:</strong> {{ accr.get_status_display }}</p>
+                    <p><strong>Created On:</strong> {{ accr.created_at|date:"F d, Y" }}</p>
+
+                    <a href="{% url 'schools:accreditation_set' school.pk %}" class="btn btn-primary">
+                        Take Another Action
+                    </a>
+                </div>
+            </div>
         {% endwith %}
+    
     {% else %}
-        <a href="{% url 'schools:accreditation_set' school.pk %}">Set Accreditation Status for this school.</a> 
+        <!-- No Accreditation Data -->
+        <div class="alert alert-warning">
+            No accreditation status has been set for this school.
+        </div>
+        <a href="{% url 'schools:accreditation_set' school.pk %}" class="btn btn-success">
+            Set Accreditation Status
+        </a>
     {% endif %}
-    <!-- Subjects sections --><hr>
-    <h2>Subjects</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Subject Name</th>
-                <th>Program</th>
-                <th>Type</th>
-                <th>Optional</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for subject in subjects %}
-                <tr>
-                    <td>{{ subject.subject_name }}</td>
-                    <td>{{ subject.get_program_display }}</td>
-                    <td>{{ subject.is_general|yesno:"General,Specific" }}</td>
-                    <td>{{ subject.is_optional|yesno:"Yes,No" }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="4">No subjects available for this school.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+</div>
+
+<hr class="my-4">
+
+<div class="container my-4">
+    <h2 class="mb-4">Subjects</h2>
+
+    {% if school.get_subjects %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Subject Name</th>
+                        <th>Program</th>
+                        <th>Type</th>
+                        <th>Optional</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in school.get_subjects %}
+                        <tr>
+                            <td>{{ subject.subject_name }}</td>
+                            <td>{{ subject.get_program_display }}</td>
+                            <td>{{ subject.is_general|yesno:"General,Specific" }}</td>
+                            <td>{{ subject.is_optional|yesno:"Yes,No" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No subjects available for this school.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            No subjects have been assigned to this school.
+        </div>
+    {% endif %}
+</div>
 
 <!-- Stakeholders sections -->
-<hr>
-    <h2>Stakeholders list</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Stakeholder Name</th>
-                <th>Position</th>
-                <th>Phone Number</th>
-                <th>Optional</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for stakeholder in stakeholders %}
-                <tr>
-                    <td>{{ stakeholder.stakeholder_name }}</td>
-                    <td>{{ stakeholder.position }}</td>
-                    <td>{{ stakeholder.contact_phone }}</td>
-                    <td>{{ stakeholder.email }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="4">No Stakeholder available for this school. <a href="{% url 'schools:stakeholder_create' school.pk %}">Add Stakeholder list here.</a> </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-      <a style="margin: 1rem 2rem; display: inline-block;" href="{% url 'schools:stakeholder_create' school.pk %}">Add Stakeholder list here.</a>
 
-  <style>
-      a { padding: .51rem; margin: 1rem; text-decoration:none; background: green; color: white;  border-radius:4px; display: inline-block; }
-  </style>
+<div class="container my-4">
+    <h2 class="mb-4">Suspension/Closure Notice</h2>
+
+    {% if school.get_latest_suspension_or_closure_report %}
+        <div class="alert alert-warning">
+            <p>This school has 
+                <span class="badge badge-info">{{ school.suspensionclosure_set.count }}</span> 
+                suspension/closure notice(s) in history.
+            </p>
+        </div>
+
+        {% with suspension=school.get_latest_suspension_or_closure_report %}
+        <!-- Latest Suspension Details -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <p><strong>Suspension Type:</strong> {{ suspension.suspension_type }}</p>
+                <p><strong>Reason:</strong> {{ suspension.reason }}</p>
+                <p><strong>To Take Effect From:</strong> {{ suspension.suspended_from|date:"F d, Y" }}</p>
+                {% if suspension.is_indefinite %}
+                    <p><strong>Until:</strong> Indefinite</p>
+                {% else %}
+                    <p><strong>Suspended Until:</strong> {{ suspension.suspended_to|date:"F d, Y" }}</p>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between mt-3">
+                    <a href="{% url 'schools:suspension_update' suspension.pk %}" class="btn btn-primary">
+                        Update Suspension
+                    </a>
+                    <a href="{% url 'schools:suspension_drop' suspension.pk %}" class="btn btn-danger">
+                        Drop Suspension
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endwith %}
+
+    {% else %}
+        <!-- No Suspension Found -->
+        <div class="alert alert-success">
+            <p>This school has 
+                <span class="badge badge-success">{{ school.suspensionclosure_set.count }}</span> 
+                suspension/closure notice(s) in history.
+            </p>
+        </div>
+        <a href="{% url 'schools:suspension_set' school.pk %}" class="btn btn-warning">
+            Suspend this School
+        </a>
+    {% endif %}
+</div>
+<div class="container my-4">
+    <h2 class="mb-4">Inspection Report</h2>
+
+    {% if school.get_latest_inspection_report %}
+        {% with report=school.get_latest_inspection_report %}
+        <!-- Latest Inspection Report Details -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <p><strong>Findings:</strong> {{ report.findings }}</p>
+                <p><strong>Recommendations:</strong> {{ report.recommendations }}</p>
+                <p><strong>Report Undertaken On:</strong> {{ report.date|date:"F d, Y" }}</p>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between mt-3">
+                    <a href="{% url 'schools:inspection_report_set' school.pk %}" class="btn btn-primary">
+                        Submit Another Inspection Report
+                    </a>
+                    <a href="{% url 'schools:inspection_report_update' report.pk %}" class="btn btn-warning">
+                        Update Report
+                    </a>
+                    <a href="{% url 'schools:inspection_report_delete' report.pk %}" class="btn btn-danger">
+                        Delete Report
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endwith %}
+
+    {% else %}
+        <!-- No Inspection Report Found -->
+        <div class="alert alert-warning">
+            No inspection report is available for this school.
+        </div>
+        <a href="{% url 'schools:inspection_report_set' school.pk %}" class="btn btn-success">
+            Submit Inspection Report
+        </a>
+    {% endif %}
+</div>
+
+<div class="container my-4">
+    <h2 class="mb-4">Stakeholders List</h2>
+
+    {% if stakeholders %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Stakeholder Name</th>
+                        <th>Position</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stakeholder in stakeholders %}
+                        <tr>
+                            <td>{{ stakeholder.stakeholder_name }}</td>
+                            <td>{{ stakeholder.position }}</td>
+                            <td>
+                                {% if stakeholder.contact_phone %}
+                                    <a href="tel:{{ stakeholder.contact_phone }}">{{ stakeholder.contact_phone }}</a>
+                                {% else %}
+                                    <span class="text-muted">Not Available</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if stakeholder.email %}
+                                    <a href="mailto:{{ stakeholder.email }}">{{ stakeholder.email }}</a>
+                                {% else %}
+                                    <span class="text-muted">Not Available</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            No stakeholders available for this school.
+        </div>
+        <a href="{% url 'schools:stakeholder_create' school.pk %}" class="btn btn-success">
+            Add Stakeholders
+        </a>
+    {% endif %}
+
+    <div class="mt-3">
+        <a href="{% url 'schools:stakeholder_create' school.pk %}" class="btn btn-primary">
+            Add More Stakeholders
+        </a>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <!-- School Header -->
+    <div class="school-header text-center">
+        <h1>{{ school.name }}</h1>
+        <p class="text-muted">A comprehensive profile of the school infrastructure.</p>
+    </div>
+
+    <hr>
+
+    <!-- Classrooms Section -->
+    <div class="section">
+        <h2>Classrooms</h2>
+        {% if classroom %}
+            <p><strong>Number of Classrooms:</strong> {{ classroom.number_of_classrooms }}</p>
+            <p><strong>Details:</strong> {{ classroom.classrooms_availability }}</p>
+        {% else %}
+            <p>No classroom data available.</p>
+        {% endif %}
+
+        <div class="row">
+            {% for image in classroom_images %}
+                <div class="col-md-4">
+                    <img src="{{ image.image.url }}" alt="Classroom Image" class="img-fluid rounded mb-3">
+                </div>
+            {% endfor %}
+            {% if classroom.images_description %}
+                <p class="text-muted">{{ classroom.images_description }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-start gap-4 align-items-center p-3 rounded">
+      
+        <!-- Delete School -->
+        <a href="{% url 'schools:delete' school.pk %}" class="btn btn-danger">
+            Delete
+        </a>
+
+        <!-- Update School -->
+        <a href="{% url 'schools:update' school.pk %}" class="btn btn-primary">
+            Update
+        </a>
+    </div>
+
+</div>
+<a style="margin: 1rem 2rem; display: inline-block;" href="{% url 'schools:classroom_create' school.pk %}">Upload school classroom details</a>
   <hr>
-   <div style="margin-top: 2rem; background: #efefef;">
-       <a href="{% url 'schools:list' %}">Back to List</a>
-  <a href="{% url 'schools:delete' school.pk %}">Delete</a>
-  <a href="{% url 'schools:update' school.pk %}">Edit</a>
-  
-   </div>
+ <div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center p-3 bg-light border rounded">
+        <!-- Back to List -->
+        <a href="{% url 'schools:list' %}" class="btn btn-secondary">
+            Back to List
+        </a>
+
+        <!-- Delete School -->
+        <a href="{% url 'schools:delete' school.pk %}" class="btn btn-danger">
+            Delete
+        </a>
+
+        <!-- Update School -->
+        <a href="{% url 'schools:update' school.pk %}" class="btn btn-primary">
+            Update
+        </a>
+    </div>
+</div>
+
 {% endblock %}

@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 from decouple import config
 from pathlib import Path
-import os
+import os, sys
 
 from django import conf
 
@@ -58,9 +58,10 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'social_django',
     'django_extensions',
-    'students.apps.StudentsConfig',
     'schools.apps.SchoolsConfig',
+    # 'students.apps.StudentsConfig',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

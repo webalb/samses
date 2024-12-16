@@ -32,4 +32,18 @@ def max_days(date_to, date_from):
     
 @register.simple_tag 
 def days_attained(date_from):
-    return (datetime.date.today() - date_from).days
+    d = (datetime.date.today() - date_from).days
+    return d if d > 0 else 0
+
+@register.filter
+def none(value):
+    """Returns 'Not Available' if the value is None or empty."""
+    return value if value else "Not Available"
+
+@register.filter
+def none_or_percentage(value):
+    """
+    Returns 'Not Available' if the value is None or empty.
+    Appends '%' to integers or floats, rounding floats to whole numbers.
+    """
+    return "Not Available" if value in [None, ''] else f"{int(value)}%"

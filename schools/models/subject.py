@@ -20,3 +20,19 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.subject_name
+
+    def clean(self):
+        # Ensure that general subjects cannot have a specific school assigned
+        if self.is_general and self.school is not None:
+            raise ValidationError("General subjects cannot be assigned to a specific school.")
+        
+        # Ensure that subjects for all programs have no specific school
+        if self.is_optional and self.school is not None:
+            raise ValidationError(f"Subjects marked optional should have a specific school assigned.")
+
+
+    class Meta:
+        unique_together = (
+            ('subject_name', 'program', 'is_general',), # unique subject_name, program, and general
+            ('subject_name', 'program', 'is_general', 'is_optional', 'school',), # for individual school, should has unique subject to same program either general or optional
+        )

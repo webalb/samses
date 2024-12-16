@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}  {% if form.instance.pk %}Update{% else %}create{% endif %} Inspection Report {% endblock %}
+{% block content %}
+<h2>{% if form.instance.pk %}Update/Edit{% else %}Set{% endif %} Inspection Report for {{ school.name }} </h2>
+<form method="post">
+    {% csrf_token %}
+    <p>
+        <input type="hidden" name="{{ form.school.html_name }}" value="{{ school.id }}" id="{{ form.school.id_for_label }}">
+    </p>
+    <div class="form-control" style="margin: 1rem;">
+        {{ form.findings.errors }}
+        <label for="{{ form.findings.id_for_label }}">Findings:</label>
+        {{ form.findings }}
+    </div>
+    <div class="form-control" style="margin: 1rem;">
+        {{ form.recommendations.errors }}
+        <label for="{{ form.recommendations.id_for_label }}">Recommendations:</label>
+        {{ form.recommendations }}
+    </div>
+    <div class="form-control" style="margin: 1rem;">
+        {{ form.date.errors }}
+        <label for="{{ form.date.id_for_label }}">Inspection undertaken on:</label>
+        {{ form.date }}
+    </div>
+
+    
+    <button type="submit">{% if form.instance.pk %}Update{% else %}Set{% endif %}</button>
+</form>
+<a href="{% url 'schools:details' school.pk %}">Back to School details</a>
+{% endblock %}

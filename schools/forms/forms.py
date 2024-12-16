@@ -1,6 +1,6 @@
 from django import forms
 from datetime import date
-from schools.models import School, AcademicSession, Subject, Term, Stakeholder, SchoolMetadata, AccreditationStatus, SuspensionClosure, InspectionReport
+from schools.models import School, AcademicSession, Subject, Term, Stakeholder, SchoolMetadata, AccreditationStatus, SuspensionClosure, InspectionReport, SchoolMetadata
 import re
 
 SCHOOL_TYPE_CHOICES = School.SCHOOL_TYPE_CHOICES
@@ -9,7 +9,7 @@ PROGRAM_CHOICES = School.PROGRAM_CHOICES
 class SchoolForm(forms.ModelForm):
     class Meta:
         model = School
-        fields = ['name', 'motto', 'school_type', 'lga', 'ward', 'email', 'phone', 'website', 'program', 'logo']
+        fields = ['name', 'abbreviation', 'motto', 'school_type', 'lga', 'ward', 'street_address', 'email', 'phone', 'website', 'program', 'logo']
 
     def __init__(self, *args, **kwargs):
         super(SchoolForm, self).__init__(*args, **kwargs)
@@ -115,10 +115,84 @@ class StakeholderForm(forms.ModelForm):
         widgets = {
             'school': forms.HiddenInput(),
         }
+
 class SchoolMetadataForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        # Dynamically set the initial school value from kwargs
+        school_pk = kwargs.pop('school_pk', None)
+        super().__init__(*args, **kwargs)
+        if school_pk:
+            self.fields['school'].initial = school_pk
+            
     class Meta:
         model = SchoolMetadata
-        fields = ['school', 'language_of_instruction', 'enrollment_capacity',]
+        fields = [
+            'school',  # The OneToOneField will be displayed as a dropdown (foreign key).
+            'language_of_instruction',
+            'enrollment_capacity',
+            'ownership_status',
+            'owner',
+            'pass_rate',
+            'graduation_rate',
+            'attendance_rate',
+            'discipline_rate',
+            'compliance_percentage',
+        ]
+        widgets = {
+            'school': forms.HiddenInput(),
+            'language_of_instruction': forms.Select(attrs={'class': 'form-control'}),
+            'enrollment_capacity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'ownership_status': forms.Select(attrs={'class': 'form-control'}),
+            'owner': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. JIBWIS JOS'}),
+            'pass_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
+            'graduation_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
+            'attendance_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
+            'discipline_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
+            'compliance_percentage': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
+        }
+        labels = {
+            'language_of_instruction': 'Language of Instruction',
+            'enrollment_capacity': 'Annual Enrollment Capacity',
+            'ownership_status': 'Ownership Status',
+            'owner': 'Owner Name',
+            'pass_rate': 'Pass Rate (%)',
+            'graduation_rate': 'Graduation Rate (%)',
+            'attendance_rate': 'Attendance Rate (%)',
+            'discipline_rate': 'Discipline Rate (%)',
+            'compliance_percentage': 'Compliance Percentage (%)',
+        }
+
+    # General percentage validation for all percentage fields (pass_rate, graduation_rate, etc.)
+    def clean_percentage_field(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if value is not None and (value < 0 or value > 100):
+            raise forms.ValidationError(f"{field_name.replace('_', ' ').title()} must be between 0 and 100.")
+        return value
+
+    # Applying the percentage validation to the fields
+    def clean_pass_rate(self):
+        return self.clean_percentage_field('pass_rate')
+
+    def clean_graduation_rate(self):
+        return self.clean_percentage_field('graduation_rate')
+
+    def clean_attendance_rate(self):
+        return self.clean_percentage_field('attendance_rate')
+
+    def clean_discipline_rate(self):
+        return self.clean_percentage_field('discipline_rate')
+
+    def clean_compliance_percentage(self):
+        return self.clean_percentage_field('compliance_percentage')
+
+    # Custom validation for enrollment capacity to ensure it's a positive number
+    def clean_enrollment_capacity(self):
+        capacity = self.cleaned_data.get('enrollment_capacity')
+        if capacity < 1:
+            raise forms.ValidationError("Enrollment capacity must be a positive integer.")
+        return capacity
+
 
 class AccreditationForm(forms.ModelForm):
     class Meta:

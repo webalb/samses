@@ -5,3 +5,4 @@ from .subject import Subject
 from .stakeholder import Stakeholder
 from .other_school_related_models import AccreditationStatus, InspectionReport, SuspensionClosure
 from .school_metadata import SchoolMetadata
+from .school_infrastructure import Classrooms, Library, Laboratory, ComputerLab, SportsFacility, SchoolImages

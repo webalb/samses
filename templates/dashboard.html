@@ -2,16 +2,78 @@
 {% block title %} SEC | Welcome {% endblock %}
 
 {% block content %}
-<h2>Dashboard</h2>
-<p>Welcome to dashboard</p>
-<h2>School management</h2>
-<p>You can <a href="{% url 'schools:list' %}">Manage schools on this server</a></p>
-<p>You can <a href="{% url 'schools:academic_sessions' %}">Manage schools academic sessions on this server</a></p>
-<p>You can <a href="{% url 'schools:subject_list' %}">Manage schools subjects </a></p>
-<h2>Students management</h2>
-<p>You can <a href="{% url 'students:list' %}">Manage Students </a></p>
+<div class="container my-4">
+    <h2 class="mb-4">Dashboard</h2>
+    <p>Welcome to the dashboard! Manage the various sections of the system below.</p>
 
-<h2>Acount management</h2>
-<p>You can <a href="{% url 'users:edit' %}">edit your profile here</a></p>
-<p>You can also <a href="{% url 'users:password_change' %}">change your password here</a></p>
+    <!-- School Management Section -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        <div class="col">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h5 class="card-title">School Management</h5>
+                    <p class="card-text">Manage schools, academic sessions, and subjects for the institutions in your network.</p>
+                    <a href="{% url 'schools:list' %}" class="btn btn-primary">Manage Schools</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Academic Sessions</h5>
+                    <p class="card-text">Create and manage academic sessions for the schools.</p>
+                    <a href="{% url 'schools:academic_sessions' %}" class="btn btn-primary">Manage Sessions</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Subjects Management</h5>
+                    <p class="card-text">Manage subjects taught in the schools across different sessions.</p>
+                    <a href="{% url 'schools:subject_list' %}" class="btn btn-primary">Manage Subjects</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Students Management Section -->
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
+        <div class="col">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Students Management</h5>
+                    <p class="card-text">Add, update, and manage students in your system.</p>
+                    <a href="{% url 'students:list' %}" class="btn btn-primary">Manage Students</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Management Section -->
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        <div class="col">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Account Management</h5>
+                    <p class="card-text">Edit your profile details and change your password.</p>
+                    <a href="{% url 'users:edit' %}" class="btn btn-primary">Edit Profile</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Change Password</h5>
+                    <p class="card-text">Update your account password to ensure security.</p>
+                    <a href="{% url 'users:password_change' %}" class="btn btn-primary">Change Password</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

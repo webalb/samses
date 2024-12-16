@@ -1,11 +1,12 @@
+import os
+import uuid
 from enum import unique
 from typing import Required
+
 from django.db import models
 from datetime import date, datetime
 from django.db.models import Q
-# from django.core.exceptions import ValidationError
-import os
-
+from django.urls import reverse
 
 class School(models.Model):
     SCHOOL_TYPE_CHOICES = [
@@ -22,7 +23,7 @@ class School(models.Model):
         ('all', 'All Programs'),
     ]
     # School Identity Information
-    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, default='')
     abbreviation = models.CharField(max_length=20, null=True, blank=True)
     motto = models.CharField(max_length=255, unique=True, blank=True, null=True)
@@ -164,17 +165,48 @@ class School(models.Model):
                     return combined_session
 
         return None
+
     def get_current_accreditation(self):
         from datetime import date
-
+        # Get the current date
         today = date.today()
+        
+        # Retrieve the most recent accreditation status
         accr = self.recent_accreditation_status()
-        if accr.valid_to < today:
-            accr.expired = True
-        return accr if accr.valid_to is not None and accr.valid_from is not None else None
+        
+        # Ensure that the accreditation status exists
+        if accr:
+            # Check if the accreditation has expired
+            if accr.valid_to and accr.valid_to < today:
+                accr.expired = True
+            
+            # Return the accreditation if both 'valid_from' and 'valid_to' are available
+            if accr.valid_from and accr.valid_to:
+                return accr
+        
+        # Return None if accreditation is invalid or missing required dates
+        return None
 
     def recent_accreditation_status(self):
         from . import AccreditationStatus
 
         accr = self.accreditationstatus_set.order_by("-created_at").first()
         return accr if accr else None 
+
+    def get_latest_inspection_report(self):
+        return self.inspectionreport_set.order_by("-date_created").first()
+
+    def get_latest_suspension_or_closure_report(self):
+        return self.suspensionclosure_set.order_by('-date_created').filter(is_dropped=False).first()
+
+    @property
+    def status(self):
+        accr = self.recent_accreditation_status()
+        if accr and accr.status == 'accreditated':
+            if not self.get_latest_suspension_or_closure_report():
+                return 'Active'
+            return self.get_latest_suspension_or_closure_report().suspension_type
+        return 'Under Investigation' 
+
+    def get_absolute_url(self):
+        return reverse('schools:details', kwargs={'pk': self.pk})       

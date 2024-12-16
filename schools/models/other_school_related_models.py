@@ -11,8 +11,8 @@ class AccreditationStatus(models.Model):
 
 	accreditation_number = models.CharField(max_length=15, unique=True, blank=True, null=True)
 	school = models.ForeignKey('School', on_delete=models.CASCADE)
-	ACCR_OPTIONS = [('pending', 'Pending'), ('accreditated', 'Accreditated'), ('not-accreditated', 'Not Accreditated'), ('cancelled', 'Accreditation cancelled')]
-	status = models.CharField(max_length=16, choices=ACCR_OPTIONS, default=ACCR_OPTIONS[0])
+	ACCR_OPTIONS = [('awaiting accreditation.', 'Awaiting Accreditation.'), ('accreditated', 'Accreditated'), ('not-accreditated', 'Not Accreditated'), ('cancelled', 'Accreditation cancelled')]
+	status = models.CharField(max_length=23, choices=ACCR_OPTIONS, default=ACCR_OPTIONS[0])
 	valid_from = models.DateField(blank=True, null=True)
 	valid_to = models.DateField(blank=True, null=True)
 	created_at = models.DateTimeField(auto_now_add=True,)
@@ -63,14 +63,19 @@ class SuspensionClosure(models.Model):
     Description:  Records of any suspensions or closures.          |
     """
     school = models.ForeignKey('School', on_delete=models.CASCADE)
-    suspension_type = models.CharField(max_length=20,)
+    OPTIONS = [('Suspended', 'Suspension'), ('Closed', 'Closure')]
+    suspension_type = models.CharField(max_length=100, choices=OPTIONS)
     reason = models.TextField()
     suspended_from = models.DateField()
-    suspended_to = models.DateField(blank=True, null=None)
+    suspended_to = models.DateField(blank=True, null=True)
     is_indefinite = models.BooleanField(default=False)
+    is_dropped = models.BooleanField(default=False,)
     date_created = models.DateTimeField(auto_now_add=True,)
 
     def save(self, *args, **kwargs):
 	    if self.is_indefinite == True:
 		    self.suspended_to = None
 	    super().save(*args, **kwargs)
+
+
+# Add models for: Level(1 to 6 for primary, 1 to 3 for jr, 1 to 3 for ss), Classes (to handle class 1A, 1B, 2C e.t.c.)

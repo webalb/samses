@@ -8,5 +8,15 @@
     {{ form.as_p }}
     <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
   </form>
-  <a href="{% url 'schools:list' %}">Back to List</a>
+  {% if form.instance.pk %} 
+  <a href="{% url 'schools:details' form.instance.pk %}">Cancel {{ form.instance.pk }}</a>
+  {% else %}
+      
+    <a href="{% url 'schools:list' %}">Back to List</a>
+
+  {% endif %}
+   <style>
+      a { padding: .51rem; margin: 1rem; text-decoration:none; background: green; color: white;  border-radius:4px; display: inline-block; }
+  </style>
+
 {% endblock %}
