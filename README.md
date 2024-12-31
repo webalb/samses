@@ -1,11 +1,9 @@
-Here’s an updated **README.md** file incorporating **Flows Algorithm**, **SLT Document**, and state-wide educational system features:  
 
 ---
 
 # **SAMSES: Smart Administration and Management System for Education System**  
 
-![SAMSES Logo](https://via.placeholder.com/150)  
-*Empowering State Education Systems with Digital Excellence*  
+*A smarter way to manage education for a smarter generation.*  
 
 ---  
 
