@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block style %}
+table {
+display: block;
+overflow-x: auto;
+white-space: nowrap;
+}
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2>Department Repository</h2>
+    <a href="{% url 'schools:vocational_department_create' %}" class="btn btn-primary mb-3">Add New Department</a>
+
+    {% if departments %}
+        <table class="table table-bordered" style="word-spacing: wrap; overflow: auto;">
+            <thead class="table-light">
+                <tr>
+                    <th>Department Name</th>
+                    <th>Description</th>
+                    <th>Certification Awarded</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for department in departments %}
+                    <tr>
+                        <td>{{ department.department }}</td>
+                        <td>{{ department.description }}</td>
+                        <td>{{ department.certification_awarded }}</td>
+                        <td>
+                            <a href="{% url 'schools:vocational_department_update' department.id %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'schools:vocational_department_delete' department.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this department?');">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-warning">No departments found.</div>
+    {% endif %}
+</div>
+
+{% endblock %}

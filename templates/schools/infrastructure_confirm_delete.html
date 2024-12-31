@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Delete {{ form_type }}?</h2>
+<p>Are you sure you want to delete this {{ form_type }}? This action cannot be undone.</p>
+
+
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a href="{% url 'schools:details' school.pk %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

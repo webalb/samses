@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %} Academic session lists {% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <p class="text-center bg-warning rounded p-2 shadow text-black fw-bold">Confirm Adding Vocational department to {{ school.name }}</p>
+
+    {% if all_departments %}
+        <p class=" fw-bold">The following departments will be added to this school:</p>
+        <ul>
+            {% for department in all_departments %}
+                <li>{{ department.department }} (<b> Certification:</b> {{ department.certification_awarded }})</li>
+            {% endfor %}
+        </ul>
+        
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Confirm and Add All department</button>
+        </form>
+    {% else %}
+        <p>No department available to add to this school.</p>
+        <a class="btn btn-secondary" href="{% url 'schools:details' school.id%}">Back to school details</a>
+    {% endif %}
+</div>
+{% endblock %}

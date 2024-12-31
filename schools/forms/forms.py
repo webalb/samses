@@ -1,35 +1,39 @@
+import re
 from django import forms
 from datetime import date
-from schools.models import School, AcademicSession, Subject, Term, Stakeholder, SchoolMetadata, AccreditationStatus, SuspensionClosure, InspectionReport, SchoolMetadata
-import re
+from schools.models import School, AcademicSession, Term, Stakeholder, SchoolMetadata, AccreditationStatus, SuspensionClosure, InspectionReport, SchoolMetadata
+
 
 SCHOOL_TYPE_CHOICES = School.SCHOOL_TYPE_CHOICES
 PROGRAM_CHOICES = School.PROGRAM_CHOICES
 
 class SchoolForm(forms.ModelForm):
+    """
+    Form for creating or updating School instances.
+    """
+    established_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+
     class Meta:
         model = School
-        fields = ['name', 'abbreviation', 'motto', 'school_type', 'lga', 'ward', 'street_address', 'email', 'phone', 'website', 'program', 'logo']
+        exclude = ['id', 'created_at', 'updated_at', 'registration_number']
+        widgets = {
+            'street_address': forms.TextInput(attrs={'class': 'form-control'}),
+            'is_vocational': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'established_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), 
+        }
 
     def __init__(self, *args, **kwargs):
-        super(SchoolForm, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs.update({'class': 'form-control', 'required': 'required'})
-        self.fields['motto'].widget.attrs.update({'class': 'form-control', 'required': 'required'})
-        self.fields['school_type'].widget.attrs.update({'class': 'form-control', 'required': 'required'})
-        self.fields['lga'].widget.attrs.update({'class': 'form-control', 'required': 'required'})
-        self.fields['ward'].widget.attrs.update({'class': 'form-control', 'required': 'required'})
-        self.fields['email'].widget.attrs.update({'class': 'form-control', 'required': 'required'})
-        self.fields['phone'].widget.attrs.update({'class': 'form-control', 'required': 'required'})
-        self.fields['website'].widget.attrs.update({'class': 'form-control'})
-        self.fields['program'].widget.attrs.update({'class': 'form-control', 'required': 'required'})
-        self.fields['logo'].widget.attrs.update({'class': 'form-control'})
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
     def clean_phone(self):
         phone_number = self.cleaned_data.get('phone')
         pattern = re.compile(r'^(?:\+234|0)?[789]\d{9}$')
-        if not pattern.match(phone_number): # type: ignore
+
+        if phone_number and not pattern.match(phone_number):
             raise forms.ValidationError("Enter a valid Nigerian phone number.")
         return phone_number
-
     
 
 class DateInput(forms.DateInput):
@@ -61,60 +65,46 @@ class AcademicSessionForm(forms.ModelForm):
 
         return cleaned_data
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs['class'] = 'form-control'
+  
+
 
 class TermForm(forms.ModelForm):
     class Meta:
         model = Term
-        fields = ['academic_session', 'start_date_1', 'end_date_1', 'start_date_2', 'end_date_2', 'start_date_3', 'end_date_3']
+        fields = ['academic_session', 'term_name', 'start_date', 'end_date']
         widgets = {
-            'start_date_1': forms.DateInput(attrs={'type': 'date', 'label': 'First term start date'}),
-            'end_date_1': forms.DateInput(attrs={'type': 'date', 'label': 'First term end date'}),
-            'start_date_2': forms.DateInput(attrs={'type': 'date', 'label': 'Second term start date'}),
-            'end_date_2': forms.DateInput(attrs={'type': 'date', 'label': 'Second term end date'}),
-            'start_date_3': forms.DateInput(attrs={'type': 'date', 'label': 'Third term start date'}),
-            'end_date_3': forms.DateInput(attrs={'type': 'date', 'label': 'Third term end date'}),
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'academic_session': forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        instance = kwargs.get('instance')
-        if instance:
-            self.fields['start_date_1'].initial = instance.start_date_1
-            self.fields['end_date_1'].initial = instance.end_date_1
-            self.fields['start_date_2'].initial = instance.start_date_2
-            self.fields['end_date_2'].initial = instance.end_date_2
-            self.fields['start_date_3'].initial = instance.start_date_3
-            self.fields['end_date_3'].initial = instance.end_date_3
-
-
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs['class'] = 'form-control'
+        
+     
 class SubjectForm(forms.ModelForm):
-    class Meta:
-        model = Subject
-        fields = ['subject_name', 'program', 'is_general', 'is_optional', 'school']
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['school'].required = False
-
-    def clean(self):
-        cleaned_data = super().clean()
-        is_general = cleaned_data.get('is_general')
-        school = cleaned_data.get('school')
-
-        if not is_general and not school:
-            self.add_error('school', 'This field is required for non-general subjects.')
-
-        return cleaned_data
+   pass
 
 
 class StakeholderForm(forms.ModelForm):
     class Meta:
         model = Stakeholder
-        fields = ['school', 'stakeholder_name', 'position', 'contact_phone', 'email']
+        fields = ['name', 'position', 'phone_number', 'email', 'tenure_start', 'tenure_end', 'profile_picture']
         widgets = {
-            'school': forms.HiddenInput(),
+            'tenure_start': forms.DateInput(attrs={'type': 'date'}),
+            'tenure_end': forms.DateInput(attrs={'type': 'date'}),
         }
+    def __init__(self, *args, **kwargs):
+        super(StakeholderForm, self).__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs['class'] = 'form-control'
 
 class SchoolMetadataForm(forms.ModelForm):
 
@@ -128,15 +118,10 @@ class SchoolMetadataForm(forms.ModelForm):
     class Meta:
         model = SchoolMetadata
         fields = [
-            'school',  # The OneToOneField will be displayed as a dropdown (foreign key).
             'language_of_instruction',
             'enrollment_capacity',
             'ownership_status',
             'owner',
-            'pass_rate',
-            'graduation_rate',
-            'attendance_rate',
-            'discipline_rate',
             'compliance_percentage',
         ]
         widgets = {
@@ -145,10 +130,6 @@ class SchoolMetadataForm(forms.ModelForm):
             'enrollment_capacity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
             'ownership_status': forms.Select(attrs={'class': 'form-control'}),
             'owner': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. JIBWIS JOS'}),
-            'pass_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
-            'graduation_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
-            'attendance_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
-            'discipline_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
             'compliance_percentage': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
         }
         labels = {
@@ -156,10 +137,6 @@ class SchoolMetadataForm(forms.ModelForm):
             'enrollment_capacity': 'Annual Enrollment Capacity',
             'ownership_status': 'Ownership Status',
             'owner': 'Owner Name',
-            'pass_rate': 'Pass Rate (%)',
-            'graduation_rate': 'Graduation Rate (%)',
-            'attendance_rate': 'Attendance Rate (%)',
-            'discipline_rate': 'Discipline Rate (%)',
             'compliance_percentage': 'Compliance Percentage (%)',
         }
 
@@ -171,18 +148,6 @@ class SchoolMetadataForm(forms.ModelForm):
         return value
 
     # Applying the percentage validation to the fields
-    def clean_pass_rate(self):
-        return self.clean_percentage_field('pass_rate')
-
-    def clean_graduation_rate(self):
-        return self.clean_percentage_field('graduation_rate')
-
-    def clean_attendance_rate(self):
-        return self.clean_percentage_field('attendance_rate')
-
-    def clean_discipline_rate(self):
-        return self.clean_percentage_field('discipline_rate')
-
     def clean_compliance_percentage(self):
         return self.clean_percentage_field('compliance_percentage')
 
@@ -197,25 +162,69 @@ class SchoolMetadataForm(forms.ModelForm):
 class AccreditationForm(forms.ModelForm):
     class Meta:
         model = AccreditationStatus
-        exclude = ['accreditation_number', 'created_at']
+        exclude = ['accreditation_number', 'created_at', 'school']
         widgets = {
             'valid_from': forms.DateInput(attrs={'type': 'date'}),
             'valid_to': forms.DateInput(attrs={'type': 'date'}),
           }
+    def __init__(self, *args, **kwargs):
+        super(AccreditationForm, self).__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs['class'] = 'form-control'
 
 class SuspensionForm(forms.ModelForm):
     class Meta:
         model = SuspensionClosure
-        exclude = ['date_created']  
+        exclude = ['created_at', 'updated_at', 'school', 'is_dropped']  
         widgets = {
             'suspended_to': forms.DateInput(attrs={'type': 'date'}),
             'suspended_from': forms.DateInput(attrs={'type': 'date'}),
           }
+        labels = {
+            'is_statewide': 'Affecting all schools in the state?',
+            'is_indefinite': 'Is the suspension indefinite?',
+        }
+    def __init__(self, *args, **kwargs):
+        super(SuspensionForm, self).__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs['class'] = 'form-control'
+        self.fields['is_statewide'].widget.attrs.update({'class': 'form-check-input'})
+        self.fields['is_indefinite'].widget.attrs.update({'class': 'form-check-input'})
+        
 
 class InspectionReportForm(forms.ModelForm):
     class Meta:
         model = InspectionReport
-        exclude = ['date_created']
+        exclude = ['date_created', 'school']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
           }
+        labels = {
+            'date': 'Inspection date',
+        }
+    def __init__(self, *args, **kwargs):
+        super(InspectionReportForm, self).__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs['class'] = 'form-control'
+
+
+
+# ===========================
+# +++++++++++++++++++++++++++
+# |||                     |||
+# ||| PARENTAL ENGAGEMENT |||
+# |||                     |||
+# +++++++++++++++++++++++++++
+# ===========================
+
+from schools.models import ParentEngagement
+
+class ParentEngagementForm(forms.ModelForm):
+    class Meta:
+        model = ParentEngagement
+        fields = ["activity_name", "activity_date", "participants_count"]
+        widgets = {
+            "activity_name": forms.TextInput(attrs={"class": "form-control"}),
+            "activity_date": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+            "participants_count": forms.NumberInput(attrs={"class": "form-control"}),
+        }

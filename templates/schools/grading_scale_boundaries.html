@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %} Subject lists {% endblock %}
+{% block style %}
+  table 
+    display: block;
+    overflow: auto;
+    white-space: nowrap;
+    max-height: 500px;
+  }
+{% endblock %}
+{% block content %}
+
+<div class="container my-4">
+    <p><b>Grade Scale:</b> {{ grading_scale.scale_name }}</p>
+    <p><b>Description:</b> {{ grading_scale.description }} </p>
+
+    <hr>
+    <div class="d-flex justify-content-between">
+        <h4 class="fw-bold">Grade Boundaries</h4>
+        <a href="{% url 'schools:grade_boundary_create' grading_scale.id %}" class="btn btn-warning btn-sm shadow rounded">Add Grade Boundary</a>
+    </div>
+    <hr>
+    {% if grade_boundaries %}
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Grade</th>
+                    <th>Lower Bound</th>
+                    <th>Upper Bound</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for boundary in grade_boundaries %}
+                
+                    <tr>
+                        <td>{{ boundary.grade }}</td>
+                        <td>{{ boundary.lower_bound }}</td>
+                        <td>{{ boundary.upper_bound }}</td>
+                        <td>{{ boundary.description }}</td>
+                        <td>
+                            <a href="{% url 'schools:grade_boundary_update' boundary.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'schools:grade_boundary_delete' boundary.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No grade boundaries available for this grading scale.</p>
+    {% endif %}
+    <a href="{% url 'schools:subject_list' %}" class="btn btn-secondary mt-3">Back to Grading Scales</a>
+</div>
+{% endblock %}

@@ -1,120 +1,106 @@
 {% extends "base.html" %}
 {% block title %} Subject lists {% endblock %}
+{% block style %}
+  table {
+    display: block;
+    width: auto;
+    overflow: auto;
+    white-space: nowrap;
+    max-height: 500px;
+  }
+{% endblock %}
 {% block content %}
   <div class="container my-4">
     <h2 class="mb-4">Subjects</h2>
 
+    <div class="d-flex justify-content-between">
     <!-- Add New Subject Button -->
     <a href="{% url 'schools:subject_create' %}" class="btn btn-success mb-4">
         Add New Subject
     </a>
 
-    <!-- Subjects Table -->
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped table-hover">
-            <thead class="thead-dark">
-                <tr style="text-align: center;">
-                    <th colspan="4">Primary</th>
-                    <th colspan="4">Junior Secondary School</th>
-                    <th colspan="4">Senior Secondary School</th>
-                </tr>
+    <!-- Configure Grading Scale for All Subjects -->
+    <a href="{% url 'schools:configure_grading_scales_all' %}" class="btn btn-primary mb-3">
+        Configure Grading Scale for All Subjects
+    </a>
+  </div>
+  <!-- Table of subjects -->
+  <table class="table table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th> <input type="checkbox" name="check-all" class="form-check-input"> </th>
+        <th>Subject Name</th>
+        <th>Category</th>
+        <th>Program Levels</th>
+        <th>Streams</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for subject in subjects %}
+        <tr>
+          <td><input type="checkbox" name="check-all" class="form-check-input"></td>
+          <td>{{ subject.subject_name }}</td>
+          <td>{{ subject.get_category_display }}</td>
+          <td>
+            {% for program_level in subject.subject_repository.program_levels.all %}
+              {{ program_level.program}},
+            {% endfor %}
+          </td>
+          <td>
+            {% for stream in subject.streams.all %}
+              {{ stream.get_name_display }},
+            {% endfor %}
+          </td>
+          <td>
+            <a class="btn btn-success btn-sm shadow" href="{% url 'schools:subject_detail' subject.pk %}">Detail</a>
+            <a class="btn btn-primary btn-sm shadow" href="{% url 'schools:subject_update' subject.pk %}">Edit</a>
+            <a class="btn btn-danger btn-sm shadow" href="{% url 'schools:subject_delete' subject.pk %}">Delete</a> <!-- Add confirmation for deletion -->
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+<div class="d-flex gap-2">
+  <a class="btn btn-warning rounded shadow-lg border-0" href="{% url 'schools:list' %}">School list</a>
+
+  <a class="btn btn-primary rounded shadow-lg border-0" href="{% url 'users:dashboard' %}">Dashboard</a>
+</div>
+</div>
+
+<div class="container my-4 bg-light">
+    <h2>Grading Scales</h2>
+    <a href="{% url 'schools:grading_scale_create' %}" class="btn btn-primary mb-3 shadow text-white ">Add New Grading Scale</a>
+    {% if grading_scales %}
+        <table class="table table-bordered shadow rounded w-100">
+            <thead>
                 <tr>
-                    <th>Subject Name</th>
-                    <th>General/Specific</th>
-                    <th>Optional</th>
-                    <th>Actions</th>
-                    <th>Subject Name</th>
-                    <th>General/Specific</th>
-                    <th>Optional</th>
-                    <th>Actions</th>
-                    <th>Subject Name</th>
-                    <th>General/Specific</th>
-                    <th>Optional</th>
+                    <th>Name</th>
+                    <th>Description</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for primary_subject, jss_subject, sss_subject in subject_rows %}
+                {% for scale in grading_scales %}
                     <tr>
-                        {% if primary_subject %}
-                                <td>{{ primary_subject.subject_name }}</td>
+                        <td>{{ scale.scale_name }}</td>
+                        <td>{{ scale.description }}</td>
+                        <td>
+                            <a class="btn btn-success btn-sm" href="{% url 'schools:grading_scale_detail' scale.pk  %}">Detail</a>
 
-                                <td>
-                                    {% if primary_subject.is_general %}
-                                        General
-                                    {% else %}
-                                        Specific to <a href="{% url 'schools:details' primary_subject.school.id %}"> {{ primary_subject.school.abbreviation }}</a>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                        {% if primary_subject.is_optional %}
-                                            Yes
-                                        {% else %}
-                                            No
-                                        {% endif %}
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-center allign-items-center gap-2">
-                                        <a class='btn btn-primary' href="{% url 'schools:subject_update' primary_subject.id %}">Edit</a>
-                                        <a class='btn btn-danger' href="{% url 'schools:subject_delete' primary_subject.id %}">Del</a>
-                                    </div>
-                                </td>
-
-                        {% endif %}
-                        {% if jss_subject %}
-
-                            <td>{{ jss_subject.subject_name }}</td>
-                            <td>
-                                {% if jss_subject.is_general %}
-                                    General
-                                {% else %}
-                                    Specific to <a href="{% url 'schools:details' jss_subject.school.id %}"> {{ jss_subject.school.abbreviation }}</a>                   
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if jss_subject.is_optional %}
-                                    Yes
-                                {% else %}
-                                    No
-                                {% endif %}
-                            </td>
-                             <td>
-                                <div class="d-flex justify-content-center allign-items-center gap-2">
-                                    <a class='btn btn-primary' href="{% url 'schools:subject_update' primary_subject.id %}">Edit</a>
-                                    <a class='btn btn-danger' href="{% url 'schools:subject_delete' primary_subject.id %}">Del</a>
-                                </div>
-                            </td>
-                        {% endif %}
-                        {% if sss_subject %}
-                            <td>{{ sss_subject.subject_name }}</td>
-                            <td>
-                                {% if sss_subject %}
-                                    {% if sss_subject.is_general %}
-                                        General
-                                    {% else %}
-                                        Specific to <a href="{% url 'schools:details' sss_subject.school.id %}"> {{ sss_subject.school.abbreviation }}</a>
-                                    {% endif %}
-                                {% endif %}
-                            </td>
-                            <td>
-                                    {% if sss_subject.is_optional %}
-                                        Yes
-                                    {% else %}
-                                        No
-                                    {% endif %}
-                            </td>
-                             <td>
-                                <div class="d-flex justify-content-center allign-items-center gap-2">
-                                    <a class='btn btn-primary' href="{% url 'schools:subject_update' primary_subject.id %}">Edit</a>
-                                    <a class='btn btn-danger' href="{% url 'schools:subject_delete' primary_subject.id %}">Del</a>
-                                </div>
-                            </td>
-                        {% endif %}
+                            <a href="{% url 'schools:grading_scale_update' scale.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'schools:grading_scale_delete' scale.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-    </div>
+    {% else %}
+        <p>No grading scales available.</p>
+    {% endif %}
 </div>
+
 
 {% endblock %}

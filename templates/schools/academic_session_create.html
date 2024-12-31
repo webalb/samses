@@ -2,12 +2,13 @@
 {% block title %}{% if form.instance.pk %}Update{% else %}create{% endif %} Academic session {% endblock %}
 
 {% block content %}
-  <h2>{% if form.instance.pk %}Update/Edit{% else %}New{% endif %} Academic session</h2>
+  <h2 class="text-center">{% if form.instance.pk %}Update/Edit{% else %}New{% endif %} academic session</h2>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
+    <button class="btn btn-success" type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
   </form>
-  <a href="{% url 'schools:academic_sessions' %}">Back to Academic sessions</a>
+  <a class="btn btn-dark mt-4" href="{% url 'schools:academic_sessions' %}">Back to Academic sessions</a>
+  
   {% endblock %}
 

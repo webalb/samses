@@ -30,8 +30,13 @@ class ClassroomsForm(forms.ModelForm):
     """
     class Meta:
         model = Classrooms
-        fields = ['number_of_classrooms', 'classrooms_availability', 'images_description']
-        widgets = {'images_description': forms.TextInput()}
+        fields = ['number_of_classrooms', 'classrooms_availability',]
+
+class ClassroomsUpdateForm(ClassroomsForm):
+    class Meta(ClassroomsForm.Meta):
+        include = ClassroomsForm.Meta.fields + ['images_description']
+
+
 
 class LibraryForm(forms.ModelForm):
     """
@@ -39,7 +44,13 @@ class LibraryForm(forms.ModelForm):
     """
     class Meta:
         model = Library
-        fields = ['book_count', 'digital_access', 'study_space_capacity', 'library_availability']
+        fields = ['book_count', 'digital_access', 'study_space_capacity', 'library_availability',]
+
+class LibraryUpdateForm(LibraryForm):
+    class Meta(LibraryForm.Meta):
+        fields = LibraryForm.Meta.fields + ['images_description']
+
+
 
 class LaboratoryForm(forms.ModelForm):
     """
@@ -47,7 +58,13 @@ class LaboratoryForm(forms.ModelForm):
     """
     class Meta:
         model = Laboratory
-        fields = ['lab_type', 'lab_equipment', 'lab_availability']
+        fields = ['lab_type', 'lab_equipment', 'lab_availability',]
+
+class LaboratoryUpdateForm(LaboratoryForm):
+    class Meta(LaboratoryForm.Meta):
+        fields = LaboratoryForm.Meta.fields + ['images_description']
+
+
 
 class ComputerLabForm(forms.ModelForm):
     """
@@ -55,7 +72,12 @@ class ComputerLabForm(forms.ModelForm):
     """
     class Meta:
         model = ComputerLab
-        fields = ['number_of_computers', 'internet_access', 'smart_classrooms', 'computer_lab_availability']
+        fields = ['number_of_computers', 'internet_access', 'smart_classrooms', 'computer_lab_availability',]
+class ComputerLabUpdateForm(ComputerLabForm):
+    class Meta(ComputerLabForm.Meta):
+        fields = ComputerLabForm.Meta.fields + ['images_description']
+
+
 
 class SportsFacilityForm(forms.ModelForm):
     """
@@ -63,17 +85,56 @@ class SportsFacilityForm(forms.ModelForm):
     """
     class Meta:
         model = SportsFacility
-        fields = ['facility_type', 'field_availability']
+        fields = ['facility_type', 'field_availability',]
+
+class SportsFacilityUpdateForm(SportsFacilityForm):
+    class Meta(SportsFacilityForm.Meta):
+        fields =SportsFacilityForm.Meta.fields + ['images_description']
+
 
 # Image Form to handle image upload and description
 class SchoolImagesForm(forms.ModelForm):
     """
     Form for uploading images with description, shared by all infrastructure types.
     """
-    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False, help_text="Optional description for the images.")
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 2}), required=False, help_text="Optional description for the images.")
     image = MultipleFileField()
     class Meta:
         model = SchoolImages
         fields = ['image']
 
-    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)       
+        self.fields['image'].required = False 
+
+# Image Form to handle image  upload without the description field
+class SchoolImagesUpdateForm(SchoolImagesForm):
+    """
+    Form for uploading images without description (description is already available), shared by all infrastructure types.
+    """
+    description = None
+
+
+
+# ==============================
+# ||| Special needs resouces |||
+# ==============================
+
+from schools.models import SpecialNeedsResource
+
+class SpecialNeedsResourceForm(forms.ModelForm):
+    class Meta:
+        model = SpecialNeedsResource
+        fields = ['resource_name', 'category', 'quantity', 'description', 'urgency_level']
+        widgets = {
+            'resource_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'urgency_level': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+class SpecialNeedsResourceUpdateForm(SpecialNeedsResourceForm):
+    class Meta(SpecialNeedsResourceForm.Meta):
+        fields =SpecialNeedsResourceForm.Meta.fields + ['images_description']
+

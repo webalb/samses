@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+    {% load custom_filters %}
+    {% block title %} Subject details | Samses {% endblock %}
+    {% block style %}
+        table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+    {% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4">Subject Details: {{ subject.subject_name }}</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Subject Information</h5>
+            <p><strong>Category:</strong> {{ subject.get_category_display }}</p>
+            <p><strong>Description:</strong> {{ subject.description|default:"No description provided" }}</p>
+            <p><strong>Program Levels:</strong> 
+                {% for level in subject.program_levels.all %}
+                    {{ level.level }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Streams:</strong> 
+                {% for stream in subject.streams.all %}
+                    {{ stream.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Date Created:</strong> {{ subject.created_at|date:"F j, Y" }}</p>
+            <p><strong>Last Updated:</strong> {{ subject.updated_at|date:"F j, Y" }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Schools Offering This Subject</h5>
+            {% if schools_offering %}
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>School</th>
+                            <th>Program</th>
+                            <th>LGA</th>
+                            <th>Compulsory</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for school in schools_offering %}
+                            <tr>
+                                <td>{{ school.name }}</td>
+                                <td>{{ school.program }}</td>
+                                <td> {{ school.lga }} </td>
+                                <td>{{ school.is_compulsory|yesno:"Yes,No" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No schools have added this subject yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Grading Configurations</h5>
+            {% if grading_configurations %}
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Grading Scale</th>
+                            <th>Weightage</th>
+                            <th>Grade Boundaries</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <tr>
+                                <td>{{ grading_configurations.grading_scale.scale_name }}</td>
+                                <td>{{ grading_configurations.weightage }}</td>
+                                <td>
+                                    {% if grading_boundaries|length > 0 %}
+
+                                        <ul>
+                                            {% for boundary in grading_boundaries|default_if_none:None %}
+
+                                                <li>{{ boundary.grade }}: {{ boundary.lower_bound }} - {{ boundary.upper_bound }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p>No grade boundaries available.</p>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a class="btn btn-primary btn-sm shadow" href="{% url 'schools:subject_grading_update' grading_configurations.id %}">Update</a>
+                                    <a class="btn btn-danger btn-sm shadow" href="{% url 'schools:subject_grading_delete' grading_configurations.id %}">Delete</a>
+                                </td>
+                            </tr>
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No grading configurations available for this subject.</p>
+                <a class="btn btn-warning btn-sm shadow rounded" href="{% url 'schools:subject_grading_create' subject.id %}">Configure grading for this subject</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <a href="{% url 'schools:subject_list' %}" class="btn btn-secondary mt-3">Back to Subjects</a>
+</div>
+
+{% endblock %} 

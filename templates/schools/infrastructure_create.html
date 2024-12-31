@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}School infrastructure {% endblock %}
+{% block content %}
+<h2 class="text-center">Add Infrastructure</h2>
+<h2 class="text-center text-muted">{% if form.instance.pk %}Update{% else %}Create{% endif %} infrastructure page for {{ school.name }} </h2>
+<hr>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <h3>{{ form_type }} Details</h3>
+    {{ form.as_p }}
+
+    <h3>Upload {{ form_type }} Images</h3>
+    {{ image_form.as_p }}
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+{% endblock %}
+

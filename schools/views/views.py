@@ -1,22 +1,37 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib import messages
 from itertools import zip_longest
+from django.contrib import messages
+from django.db.models import Q, Prefetch
 from django.views.generic.edit import FormView
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import get_list_or_404, get_object_or_404, redirect, render
 
-from schools.forms import SchoolForm, AcademicSessionForm, SubjectForm, TermForm, StakeholderForm
-from schools.models import School, AcademicSession, Subject, Term, Stakeholder, Classrooms, SchoolImages
+from schools.forms import (
+    AcademicSessionForm,
+    SchoolForm,
+    StakeholderForm,
+    SubjectForm,
+    TermForm,
+)
+from schools.models import (
+    AcademicSession,
+    Classrooms,
+    ComputerLab,
+    Laboratory,
+    Library,
+    ProgramLevelTemplate,
+    School,
+    SchoolImages,
+    SportsFacility,
+    Stakeholder,
+    Stream,
+    SpecialNeedsResource,
+    Term,
+)
 
-"""
-====================================
-| VIEWS FOR HANDLING SCHOOL MODEL  |
-|                                  |
-| Remained: adding user permission |
-|           to allow only ministry |
-|           admin to manupulate the|
-|           school model.          |
-====================================
-"""
+
+# ========================================
+# ||| VIEWS FOR HANDLING SCHOOL MODEL  |||
+# ========================================
 
 @login_required
 def school_create(request):
@@ -38,6 +53,7 @@ def school_create(request):
 @login_required
 def school_update(request, pk):
     school = get_object_or_404(School, pk=pk)
+    
     if request.method == 'POST':
         form = SchoolForm(request.POST, request.FILES, instance=school)
         if form.is_valid():
@@ -60,18 +76,44 @@ def school_details(request, pk):
     school = get_object_or_404(School, pk=pk)
     academic_session = school.get_academic_session()
     stakeholders = school.stakeholders.all()
-    classroom = Classrooms.objects.filter(school=school).order_by('-created_at').first()  # Expecting only one record
 
+    # Infrastructure
+    classroom = Classrooms.objects.filter(school=school).order_by('-created_at').first()  # Expecting only one record
+    computer_lab = ComputerLab.objects.filter(school=school).order_by('-created_at').first()  # Expecting only one record
+    library = Library.objects.filter(school=school).order_by('-created_at').first()
+    laboratory = Laboratory.objects.filter(school=school).order_by('-created_at').first()
+    sports_facility = SportsFacility.objects.filter(school=school).order_by('-created_at').first()
+    special_needs = SpecialNeedsResource.objects.filter(school=school).order_by('-created_at').first()
     # Fetch images grouped by type
-    classroom_images = SchoolImages.objects.filter(school=school, image_type='classroom').order_by('-created_at')[:3]
-   
+    classroom_images = SchoolImages.objects.filter(school=school, image_type='classrooms').order_by('-created_at')[:3]
+    computer_lab_images = SchoolImages.objects.filter(school=school, image_type='computerlab').order_by('-created_at')[:3]
+    library_images = SchoolImages.objects.filter(school=school, image_type='library').order_by('-created_at')[:3]
+    laboratory_images = SchoolImages.objects.filter(school=school, image_type='laboratoty').order_by('-created_at')[:3]
+    sports_facility_images = SchoolImages.objects.filter(school=school, image_type='sports_facility').order_by('-created_at')[:3]
+    special_needs_images = SchoolImages.objects.filter(school=school, image_type='special_needs_resource').order_by('-created_at')[:3]
+
+    # Fetch the related ProgramLevelTemplate objects
+    level_classes = school.get_levels_and_classes()
+    
     context = {
         'school': school,
         'academic_session': academic_session,
         'stakeholders': stakeholders,
+
         'classroom': classroom,
         'classroom_images': classroom_images,
-    }
+        'computer_lab': computer_lab,
+        'computer_lab_images': computer_lab_images,
+        'library': library,
+        'library_images': library_images,
+        'laboratory': laboratory,
+        'laboratory_images': laboratory_images,
+        'sports_facility': sports_facility,
+        'sports_facility_images': sports_facility_images,
+        'special_needs': special_needs,
+        'special_needs_images': special_needs_images,
+    } 
+    context = context | level_classes
     return render(request, 'schools/school_details.html', context)
 
 @login_required
@@ -148,100 +190,55 @@ def academic_session_delete(request, pk):
 ====================================
 """
 @login_required
-def term_list(request):
-    terms = Term.objects.all()
-    return render(request, 'schools/term_list.html', {'terms': terms})
-
-@login_required
 def term_detail(request, pk):
     term = get_object_or_404(Term, pk=pk)
     return render(request, 'schools/term_detail.html', {'term': term})
 
 @login_required
-def term_create_or_update(request, academic_session_id):
+def term_create(request, academic_session_id):
     academic_session = get_object_or_404(AcademicSession, id=academic_session_id)
-    term, created = Term.objects.get_or_create(academic_session=academic_session)
+    
+    if request.method == 'POST':
+        form = TermForm(request.POST)
 
+        if form.is_valid():
+            term = form.save(commit=False)
+            term.academic_session = academic_session
+            term.save()
+            messages.success(request, 'Term created successfully!')
+            return redirect('schools:academic_sessions')  # Redirect after creation
+    else:
+        form = TermForm(initial={'academic_session': academic_session})  # Create an empty form
+    
+    return render(request, 'schools/term_form.html', {'form': form, 'academic_session': academic_session})
+
+@login_required
+def term_update(request, pk):
+    # Fetch the term to update or return a 404 if not found
+    term = get_object_or_404(Term, pk=pk)
+    
     if request.method == 'POST':
         form = TermForm(request.POST, instance=term)
         if form.is_valid():
+            # Save changes to the term
             form.save()
-            messages.success(request, 'Term details saved successfully!')
-            return redirect('schools:academic_sessions')  # Redirect to the appropriate view after saving
+            messages.success(request, 'Term updated successfully!')
+            return redirect('schools:academic_sessions')  # Redirect after update
     else:
+        # Populate the form with the term instance
         form = TermForm(instance=term)
-    
-    return render(request, 'schools/term_create.html', {'form': form, 'academic_session': academic_session})
+        form.fields['academic_session'].widget.attrs['value'] = term.academic_session.pk  # Set field value directly
 
+    # Render the update form
+    return render(request, 'schools/term_form.html', {'form': form, 'academic_session': term.academic_session})
 
 @login_required
 def term_delete(request, pk):
     term = get_object_or_404(Term, pk=pk)
     if request.method == "POST":
         term.delete()
-        return redirect('schools:term_list')
+        return redirect('schools:academic_sessions')
     return render(request, 'schools/term_confirm_delete.html', {'term': term})
-
-"""
-====================================
-|  VIEWS FOR HANDLING SUBJECT MODEL|
-|                                  |
-| Remained: adding user permission |
-|           to allow only ministry |
-|           admin to manupulate the|
-|           subject model.          |
-====================================
-"""
-
-@login_required
-def subject_detail(request, pk):
-    subject = get_object_or_404(Subject, pk=pk)
-    return render(request, 'schools/subject_detail.html', {'subject': subject})
-
-@login_required
-def subject_create(request):
-    if request.method == 'POST':
-        form = SubjectForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Subject added successfully!')
-            return redirect('schools:subject_list')
-    else:
-        form = SubjectForm()
-    return render(request, 'schools/subject_create.html', {'form': form})
-
-@login_required
-def subject_list(request):
-    subjects = Subject.objects.all()
-    primary_subjects = list(subjects.filter(program='primary'))
-    jss_subjects = list(subjects.filter(program='jss'))
-    sss_subjects = list(subjects.filter(program='sss'))
-
-    # Use zip_longest to handle programs with different numbers of subjects
-    subject_rows = list(zip_longest(primary_subjects, jss_subjects, sss_subjects, fillvalue=None)) # type: ignore
-
-    return render(request, 'schools/subject_list.html', {'subject_rows': subject_rows})
-
-@login_required
-def subject_update(request, pk):
-    subject = get_object_or_404(Subject, pk=pk)
-    if request.method == "POST":
-        form = SubjectForm(request.POST, instance=subject,)
-        if form.is_valid():
-            form.save()
-            return redirect('schools:subject_list')
-    else:
-        form = SubjectForm(instance=subject,)
-    return render(request, 'schools/subject_create.html', {'form': form})
-
-@login_required
-def subject_delete(request, pk):
-    subject = get_object_or_404(Subject, pk=pk)
-    if request.method == "POST":
-        subject.delete()
-        return redirect('schools:subject_list')
-    return render(request, 'schools/subject_confirm_delete.html', {'subject': subject})
-
 
 """
 ====================================
@@ -254,18 +251,15 @@ def subject_delete(request, pk):
 ====================================
 """
 
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, DeleteView
-
-
 @login_required
 def stakeholder_create(request, pk):
     school = get_object_or_404(School, pk=pk)
     if request.method == 'POST':
         form = StakeholderForm(request.POST)
         if form.is_valid():
-            form.save()
+            stakeholder = form.save(commit=False)
+            stakeholder.school = school
+            stakeholder.save()
             messages.success(request, 'Stakeholder added successfully!')
             form = StakeholderForm()
             stakeholders = Stakeholder.objects.filter(school=school.id)
@@ -283,7 +277,6 @@ def stakeholder_update(request, pk):
         form = StakeholderForm(request.POST, instance=stakeholder)
         if form.is_valid():
             form.save()
-            print("Stakeholder %s updated successfully!" % stakeholder.stakeholder_name)
             messages.success(request, 'Stakeholder updated successfully!')
             form = StakeholderForm()
             stakeholders = Stakeholder.objects.filter(school=stakeholder.school.id)
@@ -319,7 +312,9 @@ def metadata_set(request, pk):
     if request.POST:
         form = SchoolMetadataForm(request.POST)
         if form.is_valid():
-            form.save()
+            meta = form.save(commit=False)
+            meta.school_id=school.id
+            meta.save()
             messages.success(request, "Metadata set successfully!")
             return redirect('schools:details', pk=pk)
     else:
@@ -365,7 +360,9 @@ def accreditation_set(request, pk):
     if request.POST:
         form = AccreditationForm(request.POST,)
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            instance.school_id=pk
+            instance.save()
             messages.success(request, "Accreditation set successfully for this school.")
             return redirect("schools:details", pk=pk)
         else:
@@ -379,13 +376,16 @@ def accreditation_set(request, pk):
 def accreditation_update(request, pk):
     accr = get_object_or_404(AccreditationStatus, pk=pk)
     if request.POST:
-        form = AccreditationForm(request.POST, instance=accr, initial={'school': school.pk})
+        form = AccreditationForm(request.POST, instance=accr, initial={'school': accr.school})
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            instance.school_id=accr.school_id
+            instance.save()
             messages.success(request, "Accreditation updated successfully for this school")
             return redirect("schools:details", pk=accr.school.pk)
     form = AccreditationForm(instance=accr)
     return render(request, "schools/accreditation_form.html", {'form': form,'school': accr.school})
+
 @login_required
 def accreditation_delete(request, pk):
     accr = get_object_or_404(AccreditationStatus, pk=pk)
@@ -412,7 +412,9 @@ def suspension_set(request, pk):
     if request.POST:
         form = SuspensionForm(request.POST,)
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            instance.school_id=school.pk
+            instance.save()            
             messages.success(request, "School suspended successfully.")
             return redirect("schools:details", pk=pk)
         else:
@@ -431,7 +433,7 @@ def suspension_update(request, pk):
             form.save()
             messages.success(request, "Suspension updated successfully for this school")
             return redirect("schools:details", pk=suspension.school.pk)
-    form = SuspensionForm(instance=accr)
+    form = SuspensionForm(instance=suspension)
     return render(request, "schools/suspension_form.html", {'form': form,'school': suspension.school})
 @login_required
 def suspension_drop(request, pk):
@@ -461,7 +463,9 @@ def inspection_report_set(request, pk):
     if request.POST:
         form = InspectionReportForm(request.POST,)
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            instance.school_id=pk
+            instance.save()            
             messages.success(request, "Inspection report added successfully.")
             return redirect("schools:details", pk=pk)
         else:
@@ -470,6 +474,11 @@ def inspection_report_set(request, pk):
 
     form = InspectionReportForm()
     return render(request, "schools/inspection_report_form.html", {'form': form, 'school': school})
+
+@login_required
+def inspection_report_all(request, school_id):
+    reports = get_list_or_404(InspectionReport, school_id=school_id)
+    return render(request, 'schools/reports.html', {'reports': reports})
 
 @login_required
 def inspection_report_update(request, pk):
@@ -489,3 +498,50 @@ def inspection_report_delete(request, pk):
         inspection_report.delete()
         return redirect("schools:details", pk=inspection_report.school.pk)
     return render(request, 'schools/inspection_report_confirm_delete.html', {'inspection_report': inspection_report})
+
+
+# ===========================
+# +++++++++++++++++++++++++++
+# |||                     |||
+# ||| PARENTAL ENGAGEMENT |||
+# |||                     |||
+# +++++++++++++++++++++++++++
+# ===========================
+
+from schools.models import ParentEngagement
+from schools.forms import ParentEngagementForm
+
+def parent_engagement_create(request, pk):
+    school = get_object_or_404(School, pk=pk)
+    if request.method == "POST":
+        form = ParentEngagementForm(request.POST)
+        if form.is_valid():
+            engagement = form.save(commit=False)
+            engagement.school = school
+            engagement.save()
+            messages.success(request, "Parent engagement activity added successfully.")
+            return redirect("schools:details", pk=pk)
+    else:
+        form = ParentEngagementForm()
+    return render(request, "schools/create.html", {"form": form, "object": school, 'obj_name': 'Parent Engagement'})
+
+def parent_engagement_update(request, pk):
+    engagement = get_object_or_404(ParentEngagement, pk=pk)
+    if request.method == "POST":
+        form = ParentEngagementForm(request.POST, instance=engagement)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Parent engagement activity updated successfully.")
+            return redirect("schools:details", pk=engagement.school.pk)
+    else:
+        form = ParentEngagementForm(instance=engagement)
+    return render(request, "schools/create.html", {"form": form, "object": engagement, 'obj_name': 'Parent Engagement'})
+
+def parent_engagement_delete(request, pk):
+    engagement = get_object_or_404(ParentEngagement, pk=pk)
+    school_id = engagement.school.pk
+    if request.method == "POST":
+        engagement.delete()
+        messages.success(request, "Parent engagement activity deleted successfully.")
+        return redirect("schools:details", pk=school_id)
+    return render(request, "schools/confirm_delete.html", {"object": engagement, "obj_name": "Parent Engagement"})

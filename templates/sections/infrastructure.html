@@ -1,0 +1,199 @@
+<div class="container mt-4" id="infrastructure">
+    <!-- School Header -->
+    <div class="school-header text-center">
+        <h1>{{ school.name }}</h1>
+        <p class="text-muted">A comprehensive profile of the school infrastructure.</p>
+    </div>
+
+    <hr>
+
+    <!-- Classrooms Section -->
+    <div class="section" id="classroom">
+        <h2>Classrooms</h2>
+        {% if classroom %}
+            <p><strong>Number of Classrooms:</strong> {{ classroom.number_of_classrooms }}</p>
+            <p><strong>Details:</strong> {{ classroom.classrooms_availability }}</p>
+        <div class="row">
+            {% for image in classroom_images %}
+                <div class="col-md-4">
+                    <img src="{{ image.image.url }}" alt="Classroom Image" class="img-fluid rounded mb-3">
+                </div>
+            {% endfor %}
+            {% if classroom.images_description %}
+                <p class="text-muted">{{ classroom.images_description }}</p>
+            {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-start gap-4 align-items-center p-3 rounded">
+            <!-- Delete School -->
+            <a href="{% url 'schools:classroom_delete' school.pk %}" class="btn btn-danger">
+                Delete
+            </a>
+
+            <!-- Update School -->
+            <a href="{% url 'schools:classroom_update' school.pk %}" class="btn btn-primary">
+                Update
+            </a>
+        </div>
+        {% else %}
+            <p>No classroom data available.</p>
+            <a class="btn btn-dark" href="{% url 'schools:classroom_create' school.pk %}">Upload school classroom details</a>
+        {% endif %}
+
+
+    </div>
+    <!-- Computer lab Section -->
+    <hr>
+    <div class="section" id="computer_lab">
+        <h2>Computer lab</h2>
+        {% if computer_lab %}
+            <p><strong>Number of Computers:</strong>{{ computer_lab.number_of_computers }}</p>
+            <p><strong>Smart Classrooms:</strong> {{ computer_lab.smart_classrooms|yesno:"Available,Not Available" }}</p>
+            <p><strong>Internet Access:</strong> {{ computer_lab.internet_access|yesno:"Available,Not Available" }}</p>
+            <p><strong>Details:</strong> {{ computer_lab.computer_lab_availability }}</p>
+        <div class="row">
+            {% for image in computer_lab_images %}
+                <div class="col-md-4">
+                    <img src="{{ image.image.url }}" alt="Computer Lab Image" class="img-fluid rounded mb-3">
+                </div>
+            {% endfor %}
+            {% if computer_lab.images_description %}
+                <p class="text-muted">{{ computer_lab.images_description }}</p>
+            {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-start gap-4 align-items-center p-3 rounded">
+            <!-- Delete School -->
+            <a href="{% url 'schools:computer_lab_delete' school.pk %}" class="btn btn-danger">
+                Delete
+            </a>
+
+            <!-- Update School -->
+            <a href="{% url 'schools:computer_lab_update' school.pk %}" class="btn btn-primary">
+                Update
+            </a>
+        </div>
+        {% else %}
+            <p>No Computer lab data available.</p>
+            <a class="btn btn-dark" href="{% url 'schools:computer_lab_create' school.pk %}">Upload school Computer lab details</a>
+        {% endif %}
+    </div>
+
+    <!-- Library Section -->
+    <hr>
+    <div class="section" id="library">
+        <h2>Library</h2>
+        {% if library %}
+            <p><strong>Total Books:</strong> {{ library.book_count }}</p>
+            <p><strong>Reading Areas:</strong> {{ library.study_space_capacity }}</p>
+            <p><strong>Digital Access:</strong> {{ library.digital_access|yesno:"Available,Not Available" }}</p>
+            <p><strong>Details:</strong> {{ library.library_availability }}</p>
+            <div class="row">
+                {% for image in library_images %}
+                    <div class="col-md-4">
+                        <img src="{{ image.image.url }}" alt="Library Image" class="img-fluid rounded mb-3">
+                    </div>
+                {% endfor %}
+                {% if library.images_description %}
+                    <p class="text-muted">{{ library.images_description }}</p>
+                {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-start gap-4 align-items-center p-3 rounded">
+                <a href="{% url 'schools:library_delete' school.pk %}" class="btn btn-danger">Delete</a>
+                <a href="{% url 'schools:library_update' school.pk %}" class="btn btn-primary">Update</a>
+            </div>
+        {% else %}
+            <p>No Library data available.</p>
+            <a class="btn btn-dark" href="{% url 'schools:library_create' school.pk %}">Upload Library details</a>
+        {% endif %}
+    </div>
+
+    <!-- Laboratory Section -->
+    <hr>
+    <div class="section" id="laboratory">
+        <h2>Laboratory</h2>
+        {% if laboratory %}
+            <p><strong>Type of Laboratory:</strong> {{ laboratory.lab_type }}</p>
+            <p><strong>Equipment Available:</strong> {{ laboratory.lab_equipment }}</p>
+            <p><strong>Details:</strong> {{ laboratory.lab_availability }}</p>
+            <div class="row">
+                {% for image in laboratory_images %}
+                    <div class="col-md-4">
+                        <img src="{{ image.image.url }}" alt="Laboratory Image" class="img-fluid rounded mb-3">
+                    </div>
+                {% endfor %}
+                {% if laboratory.images_description %}
+                    <p class="text-muted">{{ laboratory.images_description }}</p>
+                {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-start gap-4 align-items-center p-3 rounded">
+                <a href="{% url 'schools:laboratory_delete' school.pk %}" class="btn btn-danger">Delete</a>
+                <a href="{% url 'schools:laboratory_update' school.pk %}" class="btn btn-primary">Update</a>
+            </div>
+        {% else %}
+            <p>No Laboratory data available.</p>
+            <a class="btn btn-dark" href="{% url 'schools:laboratory_create' school.pk %}">Upload Laboratory details</a>
+        {% endif %}
+    </div>
+
+    <!-- Sport Facility Section -->
+    <hr>
+    <div class="section" id="sports_facility">
+        <h2>Sport Facility</h2>
+        {% if sports_facility %}
+            <p><strong>Type of Facility:</strong> {{ sports_facility.facility_type }}</p>
+            <p><strong>Details:</strong> {{ sports_facility.field_availability }}</p>
+            <div class="row">
+                {% for image in sports_facility_images %}
+                    <div class="col-md-4">
+                        <img src="{{ image.image.url }}" alt="Sport Facility Image" class="img-fluid rounded mb-3">
+                    </div>
+                {% endfor %}
+                {% if sports_facility.images_description %}
+                    <p class="text-muted">{{ sports_facility.images_description }}</p>
+                {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-start gap-4 align-items-center p-3 rounded">
+                <a href="{% url 'schools:sports_facility_delete' school.pk %}" class="btn btn-danger">Delete</a>
+                <a href="{% url 'schools:sports_facility_update' school.pk %}" class="btn btn-primary">Update</a>
+            </div>
+        {% else %}
+            <p>No Sport Facility data available.</p>
+            <a class="btn btn-dark" href="{% url 'schools:sports_facility_create' school.pk %}">Upload Sport Facility details</a>
+        {% endif %}
+    </div>
+
+    <!-- Special needs recouse -->
+    <hr class="mt-4">
+    <div class="section" id="sports_facility">
+        <h2>Special Needs</h2>
+        {% if special_needs %}
+            <p><b>Name of the needed resource:</b> {{ special_needs.resource_name }}</p>
+            <p><b>Category of the resource:</b> {{ special_needs.category }}</p>
+            <p><b>Required quantity:</b> {{ special_needs.category }}</p>
+            <p><b>Additional details about the resource needed:</b> {{ special_needs.description }}</p>
+            <p><b>Urgency level of the resource requirement:</b> {{ special_needs.urgency_level }}</p>
+            <p><b>Date requested:</b> {{ special_needs.date_requested }}</p>
+            <div class="row">
+                {% for image in special_needs_images %}
+                    <div class="col-md-4">
+                        <img src="{{ image.image.url }}" alt="Sport Facility Image" class="img-fluid rounded mb-3">
+                    </div>
+                {% endfor %}
+                {% if special_needs.images_description %}
+                    <p class="text-muted">{{ special_needs.images_description }}</p>
+                {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-start gap-4 align-items-center p-3 rounded">
+                <a href="{% url 'schools:special_needs_delete' school.pk %}" class="btn btn-danger">Delete</a>
+                <a href="{% url 'schools:special_needs_update' school.pk %}" class="btn btn-primary">Update</a>
+            </div>
+        {% else %}
+            <p>No Special needs data available.</p>
+            <a class="btn btn-dark" href="{% url 'schools:special_needs_create' school.pk %}">Upload Special Needs details</a>
+        {% endif %}
+    </div>

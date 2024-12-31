@@ -2,18 +2,27 @@
 {% block title %} Subject delete {% endblock %}
 {% block content %}
 <h2>Delete Subject</h2>
-<p>Are you sure you want to delete <b>
-{{ subject }} For
-    {% if subject.is_optional %}
-        {{ subject.school.name }}
-    {% else %}
-      All Schools
-      {% endif %}
-        </b> from this server?</p>
-      
-<form method="post">
+<!-- subject_confirm_delete.html -->
+
+  <p class="text-muted ">Are you sure you want to delete the subject: "{{ subject.subject_name }}"?</p>
+  
+  <!-- Display the subject details before deletion -->
+  <p>Category: {{ subject.get_category_display }}</p>
+  <p>Program Levels:
+    {% for program_level in subject.program_levels.all %}
+      {{ program_level.level }}<br>
+    {% endfor %}
+  </p>
+  <p>Streams:
+    {% for stream in subject.streams.all %}
+      {{ stream.get_name_display }}<br>
+    {% endfor %}
+  </p>
+
+  <form method="POST">
     {% csrf_token %}
-    <button type="submit">Yes, delete</button>
-    <a href="{% url 'schools:subject_list' %}">Cancel</a>
-</form>
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+  </form>
+  
+  <a href="{% url 'schools:subject_list' %}" class="btn btn-success mt-4">Cancel</a>
 {% endblock %}

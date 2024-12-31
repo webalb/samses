@@ -4,32 +4,7 @@
 <h2>{% if form.instance.pk %}Update/Edit{% else %}Set{% endif %} Suspension/Closure notice for {{ school.name }} </h2>
 <form method="post">
     {% csrf_token %}
-    <p>
-        <input type="hidden" name="{{ form.school.html_name }}" value="{{ school.id }}" id="{{ form.school.id_for_label }}">
-    </p>
-    <div class="form-control" style="margin: 1rem;">
-        {{ form.suspension_type.errors }}
-        <label for="{{ form.suspension_type.id_for_label }}">Suspension type:</label>
-        {{ form.suspension_type }}
-    </div>
-    <div class="form-control" style="margin: 1rem;">
-        {{ form.reason.errors }}
-        <label for="{{ form.reason.id_for_label }}">Suspension Reason:</label>
-        {{ form.reason }}
-    </div>
-    <div class="form-control" style="margin: 1rem;">
-        {{ form.suspended_from.errors }}
-        <label for="{{ form.suspended_from.id_for_label }}">Suspension from:</label>
-        {{ form.suspended_from }}
-    </div>
-    <div class="form-control" style="margin: 1rem;">
-        {{ form.suspended_to.errors }}
-        <label for="{{ form.suspended_to.id_for_label }}">Suspension to:</label>
-        {{ form.suspended_to }}
-        Or
-        {{ form.is_indefinite }}         <label for="{{ form.is_indefinite.id_for_label }}">Suspension Indefinite:</label>
-
-    </div>
+    {{ form.as_p }}
 
     
     <button type="submit">{% if form.instance.pk %}Update{% else %}Set{% endif %}</button>

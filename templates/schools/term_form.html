@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %} Term {% if form.instance.pk %}Update{% else %}create{% endif %} {% endblock %}
+
+{% block content %}
+  <h2 class="text-center">{% if form.instance.pk %}Set{% else %}Set{% endif %} Term</h2>
+  <p class="text-muted small text-center">
+    Academic session <b>Begin on:</b> {{ academic_session.start_date }}, <b>End on:</b> {{ academic_session.end_date}}</p>
+ 
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save</button>
+
+  </form>
+  <a class="btn btn-secondary mt-4" href="{% url 'schools:academic_sessions' %}">Back to List</a>
+{% endblock %}

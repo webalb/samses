@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}School subjects list{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h2 class="text-center">Subjects Offered by </h2>
+    <p class="text-muted text-center">{{ school.name }}</p>
+
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'schools:school_subject_create' school.pk %}" class="btn btn-primary mb-3">Add Subject</a>
+         <!-- Add All Subjects Button -->
+        <a href="{% url 'schools:school_subject_add_all' school.pk %}" class="btn btn-success mb-3">Add All Subjects to School</a>
+    </div>
+
+    {% if offered_subjects %}
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Subject Name</th>
+                    <th>Category</th>
+                    <th>Program Levels</th>
+                    <th>Streams</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in offered_subjects %}
+                    <tr>
+                        <td>{{ subject.subject_repository.subject_name }}</td>
+                        <td>{{ subject.subject_repository.get_category_display }}</td>
+                        <td>
+                            {% for level in subject.subject_repository.program_levels.all %}
+                                {% if level.program in school_program_levels %}
+                                    {{ level.level }}{% if not forloop.last %}, {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% with subject.subject_repository.streams.all|dictsort:"name" as streams %}
+                                {% for stream in streams %}
+                                    {{ stream.name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </td>
+                        <td>
+                            <a href="{% url 'schools:school_subject_update' subject.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'schools:school_subject_delete' subject.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-warning">No subjects offered by this school yet.</div>
+    {% endif %}
+</div>
+
+<div>
+    <a class="btn btn-secondary" href="{% url 'schools:details' school.pk%}">Back to school details</a>
+</div>
+
+
+{% endblock %}

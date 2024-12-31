@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     'social_django',
     'django_extensions',
     'schools.apps.SchoolsConfig',
-    # 'students.apps.StudentsConfig',
+    'student.apps.StudentConfig',
 ]
 
 
@@ -194,3 +194,44 @@ SOCIAL_AUTH_PIPELINE = [
  'social_core.pipeline.social_auth.load_extra_data',
  'social_core.pipeline.user.user_details',
 ]
+
+INTERNAL_IPS = [
+    # ...
+    '127.0.0.1',
+    'samses.edu',
+    'localhost',
+]
+
+TESTING = "test" in sys.argv
+
+if not TESTING:
+    INSTALLED_APPS = [
+        *INSTALLED_APPS,
+        "debug_toolbar",
+    ]
+    MIDDLEWARE = [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+        *MIDDLEWARE,
+    ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/samses.log', 
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'samses': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+        },
+    },
+}

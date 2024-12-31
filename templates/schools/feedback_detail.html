@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Detail feedback{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h2>Feedback Details</h2>
+    <p><strong>School:</strong> {{ feedback.school.name }}</p>
+    <p><strong>Role:</strong> {{ feedback.get_role_display }}</p>
+    <p><strong>Submitted By:</strong> {{ feedback.feedback_by|default:"Anonymous" }}</p>
+    <p><strong>Subject:</strong> {{ feedback.subject }}</p>
+    <p><strong>Feedback:</strong> {{ feedback.feedback_text }}</p>
+    <p><strong>Date:</strong> {{ feedback.created_at|date:"M d, Y H:i" }}</p>
+    <a href="{% url 'schools:feedback_list' feedback.school.id %}" class="btn btn-secondary">Back to Feedbacks</a>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Create form for {{ obj_name }}{% endblock %}
+{% block content %}
+<div class="container">
+    <p class="text-center my-4 bg-warning p-2 rounded text-black shadow-lg"> {% if form.instance.pk %}Edit {{ object }}{% else %}Add {{ obj_name }} for {{ object }} {% endif %}</p>
+    <p class="text-center text-muted text"> {{ school }} </p>
+    <p class="text-center text-muted">
+        {% if classes %}
+            Available classes in this level: 
+            {% for class in classes %}
+                {{ class|join:", "}}
+            {% endfor %}
+        {% endif %}
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save</button>
+            {% if object.school_id %}
+                
+            <a href="{% url 'schools:details' object.school_id %}" class="btn btn-secondary">Cancel</a>
+
+            {% elif school %}
+                <a href="{% url 'schools:details' school.id %}" class="btn btn-secondary">Cancel</a>
+            {% elif obj_name == 'Grading Scale' or obj_name == 'Subject' %}
+              <a class="btn btn-secondary" href="{% url 'schools:subject_list' %}">Back to Subject List</a>
+            {% elif obj_name == 'Grade Boundary' %}
+                
+              <a class="btn btn-secondary" href="{% url 'schools:grading_scale_detail' object.id %}">Back to Grade detail</a>
+            {% elif obj_name == 'Configure Subject Grading' %}
+              <a class="btn btn-secondary" href="{% url 'schools:subject_detail' object.id %}">Back to Subject detail</a>
+            
+            {% elif object.id %}
+                <a href="{% url 'schools:details' object.id %}" class="btn btn-secondary">Cancel</a>
+
+            {% endif %}
+     
+       
+        
+    </form>
+</div>
+{% endblock %}

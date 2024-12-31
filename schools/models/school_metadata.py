@@ -47,33 +47,8 @@ class SchoolMetadata(models.Model):
         help_text="Name of the owner, e.g., JIBWIS JOS, Akko Local Government", 
         blank=True, 
         null=False
-    )
-
-    # Fields for school’s performance metrics
-    pass_rate = models.DecimalField(
-        max_digits=5, decimal_places=2, 
-        null=True, blank=True, 
-        help_text="Pass rate as a percentage of students passing exams"
-    )
-    
-    graduation_rate = models.DecimalField(
-        max_digits=5, decimal_places=2, 
-        null=True, blank=True, 
-        help_text="Percentage of students graduating each year"
-    )
-    
-    attendance_rate = models.DecimalField(
-        max_digits=5, decimal_places=2, 
-        null=True, blank=True, 
-        help_text="Student attendance rate as a percentage"
-    )
-    
-    discipline_rate = models.DecimalField(
-        max_digits=5, decimal_places=2, 
-        null=True, blank=True, 
-        help_text="Percentage of disciplinary incidents"
-    )
-    
+    )    
+        
     # Field for school's compliance standard
     compliance_percentage = models.DecimalField(
         max_digits=5, decimal_places=2, 
@@ -84,3 +59,41 @@ class SchoolMetadata(models.Model):
     def __str__(self):
         return f"Metadata for {self.school.name}"
 
+# class SchoolPerformance(models.Model):
+#     school = models.OneToOneField(School, on_delete=models.CASCADE, related_name='performance')
+#     average_student_score = models.DecimalField(max_digits=5, decimal_places=2, help_text="Average score of students.")
+#     pass_rate = models.DecimalField(max_digits=5, decimal_places=2, help_text="Percentage of students passing exams.")
+#     graduation_rate = models.DecimalField(max_digits=5, decimal_places=2, help_text="Percentage of students graduating.")
+#     attendance_rate = models.DecimalField(max_digits=5, decimal_places=2, help_text="Average attendance percentage.")
+#     updated_at = models.DateTimeField(auto_now=True)
+       # Fields for school’s performance metrics
+    # pass_rate = models.DecimalField(
+    #     max_digits=5, decimal_places=2, 
+    #     null=True, blank=True, 
+    #     help_text="Pass rate as a percentage of students passing exams"
+    # )
+    
+    # graduation_rate = models.DecimalField(
+    #     max_digits=5, decimal_places=2, 
+    #     null=True, blank=True, 
+    #     help_text="Percentage of students graduating each year"
+    # )
+    # discipline_rate = models.DecimalField(
+    #     max_digits=5, decimal_places=2, 
+    #     null=True, blank=True, 
+    #     help_text="Percentage of disciplinary incidents"
+    # )
+
+    
+    # Calculate on demand
+    # attendance_rate = models.DecimalField(
+    #     max_digits=5, decimal_places=2, 
+    #     null=True, blank=True, 
+    #     help_text="Student attendance rate as a percentage"
+    # )
+    # Total number of enroled students
+    # Annual enrolment
+    # male_female student ratio
+    # Average class size
+    # Number of graduating students per year
+    # CALCULATE THEM AS @PROPERTY WHEN STUDENT MODEL IS AVAILABLE

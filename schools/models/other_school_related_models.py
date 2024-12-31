@@ -4,7 +4,10 @@ from django.db import models
 from django.db.models import Q
 
 from schools.models import School
-from students.algorithms import generate_luhn_check_digit
+from django.utils.safestring import mark_safe
+
+from student.algorithms import generate_luhn_check_digit
+
 
 # School Compliance and Accreditation Information
 class AccreditationStatus(models.Model):
@@ -22,6 +25,8 @@ class AccreditationStatus(models.Model):
 	def generate_accreditation_number(self):
 		from datetime import date
 
+		import uuid
+
 		school_type_code = {
             'public': '1',
             'private': '2',
@@ -29,14 +34,8 @@ class AccreditationStatus(models.Model):
         }
 
 		type_code = school_type_code[self.school.school_type]
-		last_school = School.objects.filter(school_type=self.school.school_type).order_by('id').last()
-		if not last_school:
-			unique_code = '001'
-		else:
-			last_id = int(last_school.registration_number[4:])  # Get the numeric part of the last school ID
-			unique_code = str(last_id + 1).zfill(3)
-		last_digit = generate_luhn_check_digit(int(unique_code+type_code))
-		return f"ACCR{str(date.today().year)[2:]}{type_code}{unique_code}{last_digit}"
+		
+		return f"ACCR{str(date.today().year)[2:]}{type_code}-{str((uuid.uuid4().int))[:7]}"
 
 	def save(self, *args, **kwargs):
 		if self.status == 'accreditated':
@@ -57,25 +56,23 @@ class InspectionReport(models.Model):
     recommendations = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def recommendations_mk(self):
+        import markdown  # Import the markdown library
+        html = markdown.markdown(self.findings)
+        return mark_safe(html)
+    @property
+    def findings_mk(self):
+        import markdown  # Import the markdown library
+        html = markdown.markdown(self.recommendations)
+        return mark_safe(html) 
+ 
 
-class SuspensionClosure(models.Model):
-    """
-    Description:  Records of any suspensions or closures.          |
-    """
-    school = models.ForeignKey('School', on_delete=models.CASCADE)
-    OPTIONS = [('Suspended', 'Suspension'), ('Closed', 'Closure')]
-    suspension_type = models.CharField(max_length=100, choices=OPTIONS)
-    reason = models.TextField()
-    suspended_from = models.DateField()
-    suspended_to = models.DateField(blank=True, null=True)
-    is_indefinite = models.BooleanField(default=False)
-    is_dropped = models.BooleanField(default=False,)
-    date_created = models.DateTimeField(auto_now_add=True,)
+class ParentEngagement(models.Model):
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='parent_engagements')
+    activity_name = models.CharField(max_length=100, help_text="Name of the activity (e.g., PTA Meeting).")
+    activity_date = models.DateField(help_text="Date of the activity.")
+    participants_count = models.PositiveIntegerField(help_text="Number of parents who participated.")
 
-    def save(self, *args, **kwargs):
-	    if self.is_indefinite == True:
-		    self.suspended_to = None
-	    super().save(*args, **kwargs)
-
-
-# Add models for: Level(1 to 6 for primary, 1 to 3 for jr, 1 to 3 for ss), Classes (to handle class 1A, 1B, 2C e.t.c.)
+    def __str__(self):
+        return f"{self.activity_name} hold on {self.activity_date}"

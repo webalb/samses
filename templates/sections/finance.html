@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %} Financial details {% endblock %}
+
+{% block content %}
+
+  <h2>School Financial details </h2>
+  <p>Comprehensive school financial documents powered by Samses</p>
+
+  <div class="container my-4">
+    <h2 class="mb-4">Fee Structure</h2>
+
+    {% if school.feestructure_set.exists %}
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Class Level</th>
+                    <th>Fee Type</th>
+                    <th>Amount (₦)</th>
+                    <th>Description</th>
+                    <th>Is Optional</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fee in school.feestructure_set.all %}
+                    <tr>
+                        <td>{{ fee.class_level }}</td>
+                        <td>{{ fee.get_fee_type_display }}</td>
+                        <td>₦{{ fee.amount|floatformat:2 }}</td>
+                        <td>{{ fee.description|default:"-" }}</td>
+                        <td>{{ fee.is_optional|yesno:"Yes,No" }}</td>
+                        <td>
+                            <a href="{% url 'schools:fee_structure_update' fee.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'schools:fee_structure_delete' fee.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-warning">
+            No fee structures available for this school.
+        </div>
+    {% endif %}
+
+    <a href="{% url 'schools:fee_structure_create' school.pk %}" class="btn btn-primary">Add Fee Structure</a>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,170 @@
+[
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 1,
+    "fields": {
+      "program": "primary",
+      "level": "Primary 1"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 2,
+    "fields": {
+      "program": "primary",
+      "level": "Primary 2"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 3,
+    "fields": {
+      "program": "primary",
+      "level": "Primary 3"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 4,
+    "fields": {
+      "program": "primary",
+      "level": "Primary 4"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 5,
+    "fields": {
+      "program": "primary",
+      "level": "Primary 5"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 6,
+    "fields": {
+      "program": "primary",
+      "level": "Primary 6"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 7,
+    "fields": {
+      "program": "jss",
+      "level": "JSS 1"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 8,
+    "fields": {
+      "program": "jss",
+      "level": "JSS 2"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 9,
+    "fields": {
+      "program": "jss",
+      "level": "JSS 3"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 10,
+    "fields": {
+      "program": "sss",
+      "level": "SSS 1"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 11,
+    "fields": {
+      "program": "sss",
+      "level": "SSS 2"
+    }
+  },
+  {
+    "model": "schools.programleveltemplate",
+    "pk": 12,
+    "fields": {
+      "program": "sss",
+      "level": "SSS 3"
+    }
+  },
+  {
+    "model": "schools.stream",
+    "pk": 1,
+    "fields": {
+      "program_level_template": 10,
+      "name": "science"
+    }
+  },
+  {
+    "model": "schools.stream",
+    "pk": 2,
+    "fields": {
+      "program_level_template": 10,
+      "name": "arts"
+    }
+  },
+  {
+    "model": "schools.stream",
+    "pk": 3,
+    "fields": {
+      "program_level_template": 10,
+      "name": "commercial"
+    }
+  },
+  {
+    "model": "schools.stream",
+    "pk": 4,
+    "fields": {
+      "program_level_template": 11,
+      "name": "science"
+    }
+  },
+  {
+    "model": "schools.stream",
+    "pk": 5,
+    "fields": {
+      "program_level_template": 11,
+      "name": "arts"
+    }
+  },
+  {
+    "model": "schools.stream",
+    "pk": 6,
+    "fields": {
+      "program_level_template": 11,
+      "name": "commercial"
+    }
+  },
+  {
+    "model": "schools.stream",
+    "pk": 7,
+    "fields": {
+      "program_level_template": 12,
+      "name": "science"
+    }
+  },
+  {
+    "model": "schools.stream",
+    "pk": 8,
+    "fields": {
+      "program_level_template": 12,
+      "name": "arts"
+    }
+  },
+  {
+    "model": "schools.stream",
+    "pk": 9,
+    "fields": {
+      "program_level_template": 12,
+      "name": "commercial"
+    }
+  }
+]

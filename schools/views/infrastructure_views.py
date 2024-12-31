@@ -1,77 +1,177 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.forms import modelformset_factory
 from django.contrib import messages
+from django.core.exceptions import ValidationError
+
 
 from schools.models import School, Classrooms, Library, Laboratory, ComputerLab, SportsFacility, SchoolImages
-from schools.forms import ClassroomsForm, LibraryForm, LaboratoryForm, ComputerLabForm, SportsFacilityForm, SchoolImagesForm
+from schools.forms import ( ClassroomsForm, SchoolImagesUpdateForm, LibraryForm, LaboratoryForm, ComputerLabForm, 
+        SportsFacilityForm, SchoolImagesForm, LibraryUpdateForm, LaboratoryUpdateForm,
+         ComputerLabUpdateForm, SportsFacilityUpdateForm )
+from schools.utils import infrastructure_create, infrastructure_update, infrastructure_delete
 
 # Classrooms Create View
 def classroom_create(request, school_id):
     """
     View to handle the creation of classroom infrastructure and associated images.
     """
-    school = get_object_or_404(School, pk=school_id)
-    if request.method == 'POST':
-        # Initialize forms with POST data
-        classroom_form = ClassroomsForm(request.POST)
-        image_form = SchoolImagesForm(request.POST, request.FILES)
+    from schools.forms import ClassroomsForm  # Import form locally if needed
+    return infrastructure_create(request, school_id, ClassroomsForm, 'classrooms')
 
-        if classroom_form.is_valid() and image_form.is_valid():
-            # Save classroom details
-            classroom = classroom_form.save(commit=False)
-            classroom.school_id = school_id
-            classroom.save()
+def classroom_update(request, school_id):
+    """
+    View to handle the update of classroom infrastructure and associated images.
+    """
+    return infrastructure_update(
+        request,
+        school_id=school_id,
+        model_class=Classrooms,  # Pass the model class
+        form_class=ClassroomsUpdateForm,  # Pass the form class
+        image_type='classroom'  # Specify the image type
+    )
 
-            # Handle multiple image uploads
-            images = request.FILES.getlist('image')  # Get the list of uploaded images
-            for image in images:
-                SchoolImages.objects.create(
-                    school_id=school_id,
-                    image=image,
-                    image_type='classroom',  # Assign the type as 'classroom'
-                )
-            messages.success(request, 'Class rooms infrastructure details uploaded successfully')
+def classroom_delete(request, school_id):
+    """
+    View to handle the deletion of classroom infrastructure and associated images.
+    """
+    return infrastructure_delete(
+        request=request,
+        school_id=school_id,
+        model_class=Classrooms,  # Pass the model class
+        image_type='classroom',  # Specify the image type
+    )
+# Specific view for computer lab creation
+def computer_lab_create(request, school_id):
+    return infrastructure_create(request, school_id, ComputerLabForm, 'computer_lab')
 
-            # Redirect to the same page or another page after saving
-            return redirect('schools:details', pk=school_id)
+def computer_lab_update(request, school_id):
+    """
+    View to handle the update of computer lab infrastructure and associated images.
+    """
+    return infrastructure_update(
+        request,
+        school_id=school_id,
+        model_class=ComputerLab,
+        form_class=ComputerLabForm,
+        image_type='computer_lab'
+    )
 
-    else:
-        # Initialize empty forms
-        classroom_form = ClassroomsForm()
-        image_form = SchoolImagesForm()
+def computer_lab_delete(request, school_id):
+    """
+    View to handle the deletion of computer lab infrastructure and associated images.
+    """
+    return infrastructure_delete(
+        request=request,
+        school_id=school_id,
+        model_class=ComputerUpdateLabs,  # Pass the model class
+        image_type='computer_lab',  # Specify the image type
+    )
 
-    return render(request, 'schools/classroom_create.html', {
-        'classroom_form': classroom_form,
-        'image_form': image_form,
-        'school': school,
-    })
-# Similarly for Library
+
+def laboratory_create(request, school_id):
+    return infrastructure_create(request, school_id, LaboratoryForm, 'laboratory')
+def laboratory_update(request, school_id):
+    return infrastructure_update(
+        request,
+        school_id=school_id,
+        model_class=Laboratory,
+        form_class=LaboratoryUpdateForm,
+        image_type='laboratory'
+    )
+
+def laboratory_delete(request, school_id):
+    return infrastructure_delete(
+        request=request,
+        school_id=school_id,
+        model_class=Laboratory,  # Pass the model class
+        image_type='laboratory',  # Specify the image type
+    )
+
+# Sport Facility Create View
+def sports_facility_create(request, school_id):
+    return infrastructure_create(
+        request=request,
+        school_id=school_id,
+        form_class=SportsFacilityForm,
+        image_type='sports_facility'
+    )
+
+# Sport Facility Update View
+def sports_facility_update(request, school_id):
+    return infrastructure_update(
+        request=request,
+        school_id=school_id,
+        model_class=SportsFacility,
+        form_class=SportsFacilityUpdateForm,
+        image_type='sports_facility',
+    )
+
+# Sport Facility Delete View
+def sports_facility_delete(request, school_id):
+    return infrastructure_delete(
+        request=request,
+        school_id=school_id,
+        model_class=SportsFacility,
+        image_type='sports_facility',
+    )
+
+# Library Create View
 def library_create(request, school_id):
-    ImageFormSet = modelformset_factory(SchoolImages, form=SchoolImagesForm, extra=3, max_num=3)
-    if request.method == 'POST':
-        library_form = LibraryForm(request.POST)
-        image_formset = ImageFormSet(request.POST, request.FILES)
+    return infrastructure_create(
+        request=request,
+        school_id=school_id,
+        form_class=LibraryForm,
+        image_type='library'
+    )
 
-        if library_form.is_valid() and image_formset.is_valid():
-            library = library_form.save(commit=False)
-            library.school_id = school_id
-            library.save()
+# Library Update View
+def library_update(request, school_id):
+    return infrastructure_update(
+        request=request,
+        school_id=school_id,
+        model_class=Library,
+        form_class=LibraryUpdateForm,
+        image_type='library',
+    )
 
-            for form in image_formset:
-                image = form.save(commit=False)
-                image.school_id = school_id
-                image.image_type = 'library'
-                image.save()
+# Library Delete View
+def library_delete(request, school_id):
+    return infrastructure_delete(
+        request=request,
+        school_id=school_id,
+        model_class=Library,
+        image_type='library',
+    )
+from schools.forms import SpecialNeedsResourceForm, SpecialNeedsResourceUpdateForm
+from schools.models import SpecialNeedsResource
+# ==============================
+# ||| Special needs resouces |||
+# ==============================
 
-            return redirect('school:library_create', school_id=school_id)
+# Library Create View
+def special_needs_create(request, school_id):
+    return infrastructure_create(
+        request=request,
+        school_id=school_id,
+        form_class=SpecialNeedsResourceForm,
+        image_type='special_needs_resource'
+    )
 
-    else:
-        library_form = LibraryForm()
-        image_formset = ImageFormSet(queryset=SchoolImages.objects.none())
+# Library Update View
+def special_needs_update(request, school_id):
+    return infrastructure_update(
+        request=request,
+        school_id=school_id,
+        model_class=SpecialNeedsResource,
+        form_class=SpecialNeedsResourceUpdateForm,
+        image_type='special_needs_resource',
+    )
 
-    return render(request, 'school/library_create.html', {
-        'library_form': library_form,
-        'image_formset': image_formset,
-    })
-
-# Repeat similar logic for Laboratory, ComputerLab, and SportsFacility
+# Library Delete View
+def special_needs_delete(request, school_id):
+    return infrastructure_delete(
+        request=request,
+        school_id=school_id,
+        model_class=SpecialNeedsResource,
+        image_type='special_needs_resource',
+    )

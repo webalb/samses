@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block title %} All School inspection reports {% endblock %}
+{% block content %}
+{% for report in reports %}
+<!-- Latest Inspection Report Details -->
+<div class="row">
+<div class=" mb-4">
+    <h3> Report {{ forloop.counter }}</h3>
+    <p class="text-muted small"> <b> Upload on: </b> {{ report.date_created }} </p>
+    <div class="card-body">
+        <p><strong>Findings:</strong> {{ report.findings_mk }}</p>
+        <p><strong>Recommendations:</strong> {{ report.recommendations_mk }}</p>
+        <p><strong>Report Undertaken On:</strong> {{ report.date|date:"F d, Y" }}</p>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between mt-3">
+            <a href="{% url 'schools:inspection_report_set' report.school.pk %}" class="btn btn-primary">
+                Submit Another Inspection Report
+            </a>
+            <a href="{% url 'schools:inspection_report_update' report.pk %}" class="btn btn-warning">
+                Update Report
+            </a>
+            <a href="{% url 'schools:inspection_report_delete' report.pk %}" class="btn btn-danger">
+                Delete Report
+            </a>
+        </div>
+    </div>
+</div>
+</div>
+{% endfor %}
+
+ <a href="{% url 'schools:details' reports.0.school.pk %}" class="btn btn-dark">
+                Back to school details
+            </a>
+        </div>
+{% endblock %}
