@@ -1,5 +1,19 @@
 {% extends "base.html" %}
 {% block title %}School subjects list{% endblock %}
+{% block style %}
+  table {
+    display: block;
+    width: 100%;
+    overflow: auto;
+    white-space: nowrap;
+    max-height: 500px;
+  }
+   tbody td {
+    font-weight: 500;
+    }
+
+{% endblock %}
+
 {% block content %}
 <div class="container my-4">
     <h2 class="text-center">Subjects Offered by </h2>
@@ -12,7 +26,7 @@
     </div>
 
     {% if offered_subjects %}
-        <table class="table table-bordered">
+        <table class="table table-light table-borderless p-4 fw-500">
             <thead class="table-light">
                 <tr>
                     <th>Subject Name</th>
@@ -42,6 +56,7 @@
                             {% endwith %}
                         </td>
                         <td>
+                            <a href="{% url 'schools:subject_detail' subject.pk %}" class="btn btn-primary btn-sm">Details</a>
                             <a href="{% url 'schools:school_subject_update' subject.pk %}" class="btn btn-warning btn-sm">Edit</a>
                             <a href="{% url 'schools:school_subject_delete' subject.pk %}" class="btn btn-danger btn-sm">Delete</a>
                         </td>

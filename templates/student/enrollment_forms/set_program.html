@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}
+    Student enrollment 2 | SAMSES
+{% endblock title %}
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <h2>Select Program for {{ student.full_name }} at {{ school.name }}</h2>
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Next</button>
+</form>
+
+{% endblock content %}

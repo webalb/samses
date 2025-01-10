@@ -32,6 +32,7 @@ white-space: nowrap;
                 <th>School(s)</th>
                 <th>Program</th>
                 <th>Duration</th>
+                <th>status</th>
                 <th>Start Date</th>
                 <th>End Date</th>
                 <th colspan="3">Term Details</th>
@@ -48,6 +49,7 @@ white-space: nowrap;
                 <td rowspan="{{ session.terms.count|default:1 }}">{{ session.schools }}</td>
                 <td rowspan="{{ session.terms.count|default:1 }}">{{ session.get_program_display }}</td>
                 <td rowspan="{{ session.terms.count|default:1 }}">{{ session.duration|readable_day_count }}</td>
+                <td rowspan="{{ session.terms.count|default:1 }}">{{ session.status }}</td>
                 <td rowspan="{{ session.terms.count|default:1 }}">{{ session.start_date|date:"F d, Y" }}</td>
                 <td rowspan="{{ session.terms.count|default:1 }}">{{ session.end_date|date:"F d, Y" }}</td>
                 {% if session.terms.count > 0 %}
@@ -141,5 +143,5 @@ white-space: nowrap;
 {% endif %}
 
 </div>
-<a href="{% url 'users:dashboard' %}" class="btn btn-secondary">Dashboard</a>
+<a href="{% url 'dashboard' %}" class="btn btn-secondary">Dashboard</a>
 {% endblock %}

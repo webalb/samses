@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %} Students List | SAMSES {% endblock %}
+
+{% block content %}
+  <h1>Student List</h1>
+
+  <a class="btn btn-primary btn-sm my-3 shadow-lg" href="{% url 'student:create' %}">Add new student</a>
+    {% if students %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Full Name</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>School</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student.full_name }}</td>
+                        <td>{{ student.get_gender_display }}</td>
+                        <td>{{ student.age }} years</td>
+                        <td>{{ student.school.name|default:"N/A" }}</td>
+                        <td>
+                            <a href="{% url 'student:details' student.pk %}" class="btn btn-info btn-sm">View</a>
+                            <a href="{% url 'student:update' student.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'student:delete' student.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-warning">No students found.</div>
+    {% endif %}
+{% endblock %}

@@ -8,6 +8,10 @@
     white-space: nowrap;
     max-height: 500px;
   }
+   tbody td {
+    font-weight: 500;
+    }
+
 {% endblock %}
 {% block content %}
   <div class="container my-4">
@@ -25,8 +29,8 @@
     </a>
   </div>
   <!-- Table of subjects -->
-  <table class="table table-striped">
-    <thead class="table-dark">
+  <table class="table table-light table-borderless">
+    <thead>
       <tr>
         <th> <input type="checkbox" name="check-all" class="form-check-input"> </th>
         <th>Subject Name</th>
@@ -66,7 +70,7 @@
 <div class="d-flex gap-2">
   <a class="btn btn-warning rounded shadow-lg border-0" href="{% url 'schools:list' %}">School list</a>
 
-  <a class="btn btn-primary rounded shadow-lg border-0" href="{% url 'users:dashboard' %}">Dashboard</a>
+  <a class="btn btn-primary rounded shadow-lg border-0" href="{% url 'dashboard' %}">Dashboard</a>
 </div>
 </div>
 

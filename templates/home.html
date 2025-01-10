@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %} SAMSES | Welcome {% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4 text-center" style="font-weight: 900; font-size: 6rem; color: green">SAMSES</h2>
+    <p class="text-center">Welcome to the dashboard! Manage the various sections of the system below.</p>
+
+    <div class="d-flex justify-content-between gap-4">
+        <a href="{% url 'schools:list' %}" class="btn btn-outline-success w-100">Schools</a>
+        <a href="{% url 'student:list' %}" class="btn btn-success w-100">Student</a>
+    </div>
+   
+</div>
+{% endblock %}

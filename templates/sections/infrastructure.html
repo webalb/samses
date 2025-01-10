@@ -11,8 +11,8 @@
     <div class="section" id="classroom">
         <h2>Classrooms</h2>
         {% if classroom %}
-            <p><strong>Number of Classrooms:</strong> {{ classroom.number_of_classrooms }}</p>
-            <p><strong>Details:</strong> {{ classroom.classrooms_availability }}</p>
+            <p><b>Number of Classrooms:</b> {{ classroom.number_of_classrooms }}</p>
+            <p><b>Details:</b> {{ classroom.classrooms_availability }}</p>
         <div class="row">
             {% for image in classroom_images %}
                 <div class="col-md-4">
@@ -47,10 +47,10 @@
     <div class="section" id="computer_lab">
         <h2>Computer lab</h2>
         {% if computer_lab %}
-            <p><strong>Number of Computers:</strong>{{ computer_lab.number_of_computers }}</p>
-            <p><strong>Smart Classrooms:</strong> {{ computer_lab.smart_classrooms|yesno:"Available,Not Available" }}</p>
-            <p><strong>Internet Access:</strong> {{ computer_lab.internet_access|yesno:"Available,Not Available" }}</p>
-            <p><strong>Details:</strong> {{ computer_lab.computer_lab_availability }}</p>
+            <p><b>Number of Computers:</b>{{ computer_lab.number_of_computers }}</p>
+            <p><b>Smart Classrooms:</b> {{ computer_lab.smart_classrooms|yesno:"Available,Not Available" }}</p>
+            <p><b>Internet Access:</b> {{ computer_lab.internet_access|yesno:"Available,Not Available" }}</p>
+            <p><b>Details:</b> {{ computer_lab.computer_lab_availability }}</p>
         <div class="row">
             {% for image in computer_lab_images %}
                 <div class="col-md-4">
@@ -84,10 +84,10 @@
     <div class="section" id="library">
         <h2>Library</h2>
         {% if library %}
-            <p><strong>Total Books:</strong> {{ library.book_count }}</p>
-            <p><strong>Reading Areas:</strong> {{ library.study_space_capacity }}</p>
-            <p><strong>Digital Access:</strong> {{ library.digital_access|yesno:"Available,Not Available" }}</p>
-            <p><strong>Details:</strong> {{ library.library_availability }}</p>
+            <p><b>Total Books:</b> {{ library.book_count }}</p>
+            <p><b>Reading Areas:</b> {{ library.study_space_capacity }}</p>
+            <p><b>Digital Access:</b> {{ library.digital_access|yesno:"Available,Not Available" }}</p>
+            <p><b>Details:</b> {{ library.library_availability }}</p>
             <div class="row">
                 {% for image in library_images %}
                     <div class="col-md-4">
@@ -114,9 +114,9 @@
     <div class="section" id="laboratory">
         <h2>Laboratory</h2>
         {% if laboratory %}
-            <p><strong>Type of Laboratory:</strong> {{ laboratory.lab_type }}</p>
-            <p><strong>Equipment Available:</strong> {{ laboratory.lab_equipment }}</p>
-            <p><strong>Details:</strong> {{ laboratory.lab_availability }}</p>
+            <p><b>Type of Laboratory:</b> {{ laboratory.lab_type }}</p>
+            <p><b>Equipment Available:</b> {{ laboratory.lab_equipment }}</p>
+            <p><b>Details:</b> {{ laboratory.lab_availability }}</p>
             <div class="row">
                 {% for image in laboratory_images %}
                     <div class="col-md-4">
@@ -143,8 +143,8 @@
     <div class="section" id="sports_facility">
         <h2>Sport Facility</h2>
         {% if sports_facility %}
-            <p><strong>Type of Facility:</strong> {{ sports_facility.facility_type }}</p>
-            <p><strong>Details:</strong> {{ sports_facility.field_availability }}</p>
+            <p><b>Type of Facility:</b> {{ sports_facility.facility_type }}</p>
+            <p><b>Details:</b> {{ sports_facility.field_availability }}</p>
             <div class="row">
                 {% for image in sports_facility_images %}
                     <div class="col-md-4">

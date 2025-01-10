@@ -55,11 +55,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users.apps.UsersConfig',
-    'social_django',
+    'django.contrib.sites',  # Required by Allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount', 
+    # 'backend.users.apps.UsersConfig',
+    # 'social_django',
     'django_extensions',
-    'schools.apps.SchoolsConfig',
-    'student.apps.StudentConfig',
+    'backend.schools.apps.SchoolsConfig',
+    'backend.student.apps.StudentConfig',
 ]
 
 
@@ -71,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'samses.urls'
@@ -130,12 +135,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # Absolute path to the static directory (at root)
-
-# Add the root static directory to STATICFILES_DIRS
 STATICFILES_DIRS = [
-    BASE_DIR,  # Add the root directory
+    os.path.join(BASE_DIR, 'static'), 
 ]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -146,11 +149,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custome Settings
 
 # updating the settings to allow django to use our custom user model
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'auth.User'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-LOGIN_REDIRECT_URL = "users:dashboard"
-LOGIN_URL = "users:login"
+LOGIN_REDIRECT_URL = "dashboard"
+
+SITE_ID = 1
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'  # Allow login with username or email
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Choose 'mandatory', 'optional', or 'none'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
 # media url settings
 MEDIA_URL = '/media/'
@@ -159,10 +168,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Authentication Backend
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'users.authentication.EmailAuthBackend',
-    'social_core.backends.facebook.FacebookOAuth2',
-    'social_core.backends.twitter.TwitterOAuth',
-    'social_core.backends.google.GoogleOAuth2',
+    # 'users.authentication.EmailAuthBackend',
+    # 'social_core.backends.facebook.FacebookOAuth2',
+    # 'social_core.backends.twitter.TwitterOAuth',
+    # 'social_core.backends.google.GoogleOAuth2',
+    'allauth.account.auth_backends.AuthenticationBackend',  # Allauth
+
 ]
 
 # allowing JSON for social_django to be use with PostgressSQL

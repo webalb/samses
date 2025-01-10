@@ -9,9 +9,9 @@
     <h3> Report {{ forloop.counter }}</h3>
     <p class="text-muted small"> <b> Upload on: </b> {{ report.date_created }} </p>
     <div class="card-body">
-        <p><strong>Findings:</strong> {{ report.findings_mk }}</p>
-        <p><strong>Recommendations:</strong> {{ report.recommendations_mk }}</p>
-        <p><strong>Report Undertaken On:</strong> {{ report.date|date:"F d, Y" }}</p>
+        <p><b>Findings:</b> {{ report.findings_mk }}</p>
+        <p><b>Recommendations:</b> {{ report.recommendations_mk }}</p>
+        <p><b>Report Undertaken On:</b> {{ report.date|date:"F d, Y" }}</p>
         
         <!-- Action Buttons -->
         <div class="d-flex justify-content-between mt-3">

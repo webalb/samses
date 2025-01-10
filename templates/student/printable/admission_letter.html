@@ -1,0 +1,55 @@
+{% extends 'print_base.html' %}
+{% block title %}
+    Admission Letter | SAMSES
+{% endblock %}
+    {% block content %}
+        <div class="letter-content">
+            <div class="letter-header">
+                <img src="{{ school.logo.url }}" alt="School Logo" class="rounded-circle img-fluid logo">
+                <h3 class="fw-bold text-uppercase">{{ school.name }}</h3>
+                <p class="text-muted">Address: {{ school.street_address }} | Contact: {{ school.phone }} | Email: {{ school.email }}</p>
+            </div>
+            <hr>
+            <p class="mt-4">
+                <strong>Date:</strong> {{ enrollment.enrollment_date }}<br>
+                <strong>To:</strong> {{ student.full_name }}<br>
+                <strong>Address:</strong> {{ student.address }}
+            </p>
+            <h5 class="text-black text-center text-uppercase text-decoration-underline fw-bold mt-4">Admission ACCEPTANCE LETTER</h5>
+            <p class="mt-4">
+                Dear {{ student.full_name }},
+            </p>
+            <p>
+                Congratulations! We are pleased to inform you that you have been admitted to <strong> {{ enrollment.program_level.program_level_template.get_program_display }} </strong> at <strong>{{ school.name }}</strong> for the academic session <strong>{{ enrollment.academic_session.session_name }}</strong>. 
+                Your admission is based on your exceptional qualifications and performance.
+            </p>
+            <p>
+                Please find below the details of your admission:
+            </p>
+            <ul>
+                <li><strong>Program:</strong> {{ enrollment.program_level.program_level_template.get_program_display }}</li>
+                <li><strong>Level and Class Section :</strong> {{ enrollment.program_level.program_level_template.level }}{{ enrollment.program_level.class_section_name }}</li>
+                <li><strong>Admission Number:</strong> {{ student.reg_num }}</li>
+                <li><strong>Session Start Date:</strong> {{ enrollment.academic_session.start_date }}</li>
+                <li><strong>Duration:</strong> {{ enrollment.academic_session.duration_in_months }}</li>
+            </ul>
+            <p>
+                Kindly complete the admission process by [mention deadline, e.g., paying your fees] to confirm your enrollment. You can find detailed instructions on our website or contact the admissions office for assistance.
+            </p>
+            <p>
+                We are excited to welcome you to our academic community. Should you have any questions, please do not hesitate to contact us at <strong> {{ school.phone }} </strong>.
+            </p>
+            <p>
+                Best regards,
+            </p>
+            <div class="signature my-4">
+                <strong>Ibrahim Lawal Ibrahim</strong><br>
+                Admissions Officer<br>
+                {{ school.name }}            </div>
+              <div class="divider mt-2"></div>
+            <div class="letter-footer">
+                © 2025 - SAMSES. All rights reserved.
+            </div>
+        </div>
+
+{% endblock %}

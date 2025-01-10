@@ -15,20 +15,20 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5>Subject Information</h5>
-            <p><strong>Category:</strong> {{ subject.get_category_display }}</p>
-            <p><strong>Description:</strong> {{ subject.description|default:"No description provided" }}</p>
-            <p><strong>Program Levels:</strong> 
+            <p><b>Category:</b> {{ subject.get_category_display }}</p>
+            <p><b>Description:</b> {{ subject.description|default:"No description provided" }}</p>
+            <p><b>Program Levels:</b> 
                 {% for level in subject.program_levels.all %}
                     {{ level.level }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </p>
-            <p><strong>Streams:</strong> 
+            <p><b>Streams:</b> 
                 {% for stream in subject.streams.all %}
                     {{ stream.name }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </p>
-            <p><strong>Date Created:</strong> {{ subject.created_at|date:"F j, Y" }}</p>
-            <p><strong>Last Updated:</strong> {{ subject.updated_at|date:"F j, Y" }}</p>
+            <p><b>Date Created:</b> {{ subject.created_at|date:"F j, Y" }}</p>
+            <p><b>Last Updated:</b> {{ subject.updated_at|date:"F j, Y" }}</p>
         </div>
     </div>
 

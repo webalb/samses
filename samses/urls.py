@@ -5,13 +5,19 @@ from django.conf import settings
 from django.conf.urls.static import static
 from debug_toolbar.toolbar import debug_toolbar_urls
 
+from backend.samses_views import home_view, dashboard
+
 urlpatterns = [
     
     path('admin/', admin.site.urls),
-    path('account/', include('users.urls', namespace='users')),
-    path('schools/', include('schools.urls', namespace='schools')),
-    # path('students/', include('students.urls', namespace='students')),
+    # path('account/', include('backend.users.urls', namespace='users')),
+    path('accounts/', include('allauth.urls')),
+
+    path('schools/', include('backend.schools.urls', namespace='schools')),
+    path('student/', include('backend.student.urls', namespace='student')),
     path('social-auth/', include('social_django.urls', namespace='social')),
+    path('', home_view),
+    path('/dashboard', dashboard, name="dashboard"),
     # path('accounts/', include('django.contrib.auth.urls')),
 
 ] + debug_toolbar_urls()

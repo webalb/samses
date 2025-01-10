@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block title %}
+Student Details | SAMSES
+{% endblock title %}
+{% block style %}
+body {
+background: linear-gradient(120deg, #f0f0f0, #d9d9d9);
+height: 100vh;
+margin: 0;
+}
+.detail {
+font-size: 0.9rem;
+color: #555;
+}
+.highlight {
+font-weight: bold;
+color: #0072ff;
+}
+.content {
+position: relative;
+<!-- background: rgba(225, 225, 225, 0.95); -->
+padding: 15px;
+border-radius: 30px;
+height: 80%;
+margin-right: 20px;
+overflow: none;
+.ideas {
+display: flex;
+.idea {
+box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+width: 50%;
+padding: 20px;
+border-radius: 20px;
+&:nth-of-type(2) {
+margin-left: 15px;
+}
+p {
+font-size: 1.2rem;
+}
+}
+}
+}
+@keyframes progress {
+0% { --percentage: 0; }
+100% { --percentage: var(--value); }
+}
+@property --percentage {
+syntax: '<number>';
+    inherits: true;
+    initial-value: 0;
+    }
+    [role="progressbar"] {
+    --percentage: var(--value);
+    --primary: #369;
+    --secondary: #adf;
+    --size: 150px;
+    animation: progress 2s 0.5s forwards;
+    width: var(--size);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    }
+    [role="progressbar"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: conic-gradient(var(--primary) calc(var(--percentage) * 1%), var(--secondary) 0);
+    mask: radial-gradient(white 55%, transparent 0);
+    mask-mode: alpha;
+    -webkit-mask: radial-gradient(#0000 55%, #000 0);
+    -webkit-mask-mode: alpha;
+    }
+    [role="progressbar"]::after {
+    counter-reset: percentage var(--value);
+    content: counter(percentage) '%';
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: calc(var(--size) / 5);
+    color: var(--primary);
+    }
+    .card {
+    border: none !important;
+    border-radius: .5rem;
+    }
+    table td,
+    table th {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    }
+    tbody td {
+    font-weight: 500;
+    }
+    {% endblock style %}
+    {% block content %}
+    <div class="content">
+        <div class="ideas">
+            <div class=" idea card p-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div>
+                        <img src="{{ student.passport_photograph.url }}" class="img-fluid rounded">
+                    </div>
+                    {% if student.enrollment_record %}
+                    {% with record=student.enrollment_record %}
+                    <div class="ml-3 w-100">
+                        <h4 class="mb-0 mt-4">{{ student.full_name }}</h4>
+                        <span>Reg. No: <span class="text-danger fw-bold"> {{ student.reg_num}} </span> </span>
+                        <div class="p-2 my-4 bg-light text-dark d-flex justify-content-between rounded text-center gap-4 text-uppercase">
+                            <div class="d-flex flex-column">
+                                <span class="articles">Program</span>
+                                <span class="number1">{{ record.program_level.program_level_template.program }}</span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="followers">Level</span>
+                                <span class="text-uppercase">{{ record.program_level.program_level_template.level }}</span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="rating">Class</span>
+                                <span class="number3">{{ record.program_level.class_section_name }}</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 d-flex flex-row align-items-center gap-2">
+                            <a class="btn btn-sm btn-outline-primary w-100">Open class</a>
+                            <a target="_blank" href="{% url 'schools:class_detail' record.program_level.id %}" class="btn btn-sm btn-primary w-100 ml-2">Open Class Details</a>
+                        </div>
+                    </div>
+                    {% endwith %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="idea">
+                <p class="text-uppercase">Current Academic Term</p>
+                {% with term=student.enrollment_record.academic_session.get_current_term %}
+                <div class="d-flex justify-items-between">
+                    <div>
+                        <h3><strong>{{ term.get_term_name_display }}</strong> <span class="text-muted">(<span class="highlight">{{ term.academic_session.session_name}}</span>)</span></h3>
+                        <p class="card-text">
+                            <small>
+                                Starts: <span class="highlight">{{ term.start_date }} </span>
+                                | Ends: <span class="highlight">{{ term.end_date }}</span>
+                            </small>
+                        </p>
+                        <div class="mt-2">
+                            <small>
+                                Days in Term: <span class="highlight">{% days_between term.end_date term.start_date %}</span>
+                                | Days Passed: <span class="highlight">{% days_passed term.start_date %}</span>
+                                | Days Remaining: <span class="highlight">{% days_remaining term.end_date %}</span>
+                            </small>
+                        </div>
+                    </div>
+                    <div role="progressbar" aria-valuenow="{% percentage_attained  term.start_date term.end_date %}" aria-valuemin="0" aria-valuemax="100" style="--value: {% percentage_attained term.start_date term.end_date %}"></div>
+                </div>
+                <p class="card-text">
+                    <small>
+                        Session Starts: <span class="highlight">09/01/2024</span>
+                    </small>
+                </p>
+            </div>
+            {% endwith %}
+        </div>
+    </div>
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-light border-0">
+                <div class="container my-4">
+                    <h3 class="mb-3">Your Subjects</h3>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for subject in subjects %}
+                        <a target="_blank" href="{% url 'schools:subject_detail' subject.id %}" class="btn btn-outline-primary btn-lg">
+                            {{ subject.subject_name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if student.passport_photograph %}
+                        <img src="{{ student.passport_photograph.url }}" alt="Passport Photograph" class="img-thumbnail">
+                        {% else %}
+                        <p>No photograph available.</p>
+                        {% endif %}
+                        <hr>
+                        <div class="container">
+                            {% if student.enrollment_record %}
+                            {% with record=student.enrollment_record %}
+                            <p><b>School:</b> {{ record.school.name }}</p>
+                            <p><b>Program:</b> {{ record.program_level.program_level_template.get_program_display }}</p>
+                            <p><b>Academic session:</b> {{ record.academic_session.session_name }}</p>
+                            <p><b>Enrollment mode:</b> {{ record.get_enrollment_mode_display }}</p>
+                            <p><b>level and class section:</b> {{ record.program_level.program_level_template.level }}{{ record.program_level.class_section_name }}</p>
+                            {% if record.stream %}
+                            <p><b>stream:</b> {{ record.stream }}</p>
+                            {% endif %}
+                            <p><b>Enrollment date:</b> {{ record.enrollment_date }}</p>
+                            <p><b>Is active:</b> {{ record.is_active|yesno:"Yes,No" }}</p>
+                            <a href="{% url 'student:admission_letter' record.id %}" class="btn btn-primary btn-sm my-4">
+                                View/Download Admission Letter
+                            </a>
+                            <a href="{% url 'student:enrollment_update' record.pk %}" class="btn btn-warning btn-sm mx-2">Edit</a>
+                            <a href="{% url 'student:enrollment_delete' record.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                            {% endwith %}
+                            {% else %}
+                            <a href="{% url 'student:select_school' student.id %}" class="btn btn-primary mt-3">Enroll this student</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h5>Personal Information</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-light table-borderless mb-0">
+                                            <tbody>
+                                                <tr>
+                                                    <th>First Name</th>
+                                                    <td>{{ student.first_name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Last Name</th>
+                                                    <td>{{ student.last_name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Middle Name</th>
+                                                    <td>{{ student.middle_name|default:"N/A" }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Gender</th>
+                                                    <td>{{ student.get_gender_display }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Date of Birth</th>
+                                                    <td>{{ student.date_of_birth }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Age</th>
+                                                    <td>{{ student.age }} years</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Blood Group</th>
+                                                    <td>{{ student.get_blood_group_display|default:"N/A" }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Genotype</th>
+                                                    <td>{{ student.get_genotype_display|default:"N/A" }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Disability Status</th>
+                                                    <td>{{ student.disability_status|default:"None" }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h5>Address Information</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-light table-borderless mb-0">
+                                            <tbody>
+                                                <tr>
+                                                    <th>Country of Birth</th>
+                                                    <td>{{ student.country_of_birth|default:"N/A" }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>State of Origin</th>
+                                                    <td>{{ student.state_of_origin|default:"N/A" }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Local Government Area</th>
+                                                    <td>{{ student.place_of_birth|default:"N/A" }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Address</th>
+                                                    <td>{{ student.address|default:"N/A" }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container my-4">
+        <h3>Guardian Information</h3>
+        <a href="{% url 'student:guardian_create' student.id %}" class="btn btn-primary btn-sm mb-3">Add Guardian</a>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="card bg-light shadow-2-strong">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                {% if student.guardians.exists %}
+                                <table class="table table-light table-borderless mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Full Name</th>
+                                            <th scope="col">Relationship</th>
+                                            <th scope="col">Role</th>
+                                            <th scope="col">Phone Number</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Address</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for guardian in student.guardians.all %}
+                                        <tr>
+                                            <td scope="row">{{ guardian.full_name }}</td>
+                                            <td>{{ guardian.get_relationship_display }}</td>
+                                            <td>{{ guardian.get_role_display }}</td>
+                                            <td>{{ guardian.phone_number }}</td>
+                                            <td>{{ guardian.email|default:"-" }}</td>
+                                            <td>{{ guardian.address|default:"-" }}</td>
+                                            <td>
+                                                <a href="{% url 'student:guardian_update' guardian.id %}" class="btn btn-warning btn-sm">Edit</a>
+                                                <a href="{% url 'student:guardian_delete' guardian.id %}" class="btn btn-danger btn-sm">Delete</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %} </tbody>
+                                </table>
+                                {% else %}
+                                <div class="alert alert-info">No guardians added for this student.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a class="btn btn-secondary btn-sm shadow my-4" href="{% url 'student:list' %}">Back to student list</a>
+    {% endblock %}

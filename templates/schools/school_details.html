@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load custom_filters %}
+
 {% block title %} School Details {% endblock %}
 {% block style %}
     table {
@@ -7,7 +9,6 @@
         white-space: nowrap;
     }
 {% endblock %}
-{% load custom_filters %}
 {% block content %}
 <div class="text-center my-4">
     <!-- School Logo -->
@@ -53,6 +54,12 @@
                 School Finance
             </a>
         </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link bg-light" target="_blank" href="{% url 'schools:attendance_settings' school.id %}">
+                Attendance Setting
+            </a>
+        </li>
+
 
 
     </ul>
@@ -65,8 +72,8 @@
 
         </div>
         <div class="card-body">
-            <p><strong>School Registration Number:</strong> {{ school.registration_number }}</p>
-            <p><strong>School Accreditation Number:</strong>
+            <p><b>School Registration Number:</b> {{ school.registration_number }}</p>
+            <p><b>School Accreditation Number:</b>
                 {% if school.get_current_accreditation %}
                 {% with accr=school.get_current_accreditation %}
                 {{ accr.accreditation_number }}
@@ -75,9 +82,9 @@
                 <span class="text-muted">Not available</span>
                 {% endif %}
             </p>
-            <p><strong>Type:</strong> {{ school.get_school_type_display }}</p>
-            <p><strong>Established On:</strong> {{ school.established_date }}</p>
-            <p><strong>Status:</strong> {{ school.status }}</p>
+            <p><b>Type:</b> {{ school.get_school_type_display }}</p>
+            <p><b>Established On:</b> {{ school.established_date }}</p>
+            <p><b>Status:</b> {{ school.status }}</p>
         </div>
     </div>
     <!-- Address Section -->
@@ -86,12 +93,12 @@
             <h4>Address</h4>
         </div>
         <div class="card-body">
-            <p><strong>LGA:</strong> {{ school.lga }}</p>
+            <p><b>LGA:</b> {{ school.lga }}</p>
             {% if school.city %}
-            <p><strong>City:</strong> {{ school.city }}</p>
+            <p><b>City:</b> {{ school.city }}</p>
             {% endif %}
-            <p><strong>Ward:</strong> {{ school.ward }}</p>
-            <p><strong>Street Address:</strong> {{ school.street_address }}</p>
+            <p><b>Ward:</b> {{ school.ward }}</p>
+            <p><b>Street Address:</b> {{ school.street_address }}</p>
         </div>
     </div>
     <!-- Contact Info Section -->
@@ -100,28 +107,28 @@
             <h4>Contact Information</h4>
         </div>
         <div class="card-body">
-            <p><strong>Email:</strong>
+            <p><b>Email:</b>
                 {% if school.email %}
                 <a href="mailto:{{ school.email }}">{{ school.email }}</a>
                 {% else %}
                 <span class="text-muted">Not available</span>
                 {% endif %}
             </p>
-            <p><strong>Phone:</strong>
+            <p><b>Phone:</b>
                 {% if school.phone %}
                 <a href="tel:{{ school.phone }}">{{ school.phone }}</a>
                 {% else %}
                 <span class="text-muted">Not available</span>
                 {% endif %}
             </p>
-            <p><strong>Website:</strong>
+            <p><b>Website:</b>
                 {% if school.website %}
                 <a href="{{ school.website }}" target="_blank">{{ school.website }}</a>
                 {% else %}
                 <span class="text-muted">Not available</span>
                 {% endif %}
             </p>
-            <p><strong>Program:</strong> {{ school.get_program_display }}</p>
+            <p><b>Program:</b> {{ school.get_program_display }}</p>
         </div>
     </div>
 </div>
@@ -143,30 +150,30 @@
    <div class="alert alert-info">
         {% if academic_session.status == "ongoing" %}
             <p>
-                Academic session: <strong>{{ academic_session.session_name }}</strong> is ongoing and will end on 
-                <strong>{{ academic_session.end_date|date:"l, F d, Y" }}</strong>.
+                Academic session: <b>{{ academic_session.session_name }}</b> is ongoing and will end on 
+                <b>{{ academic_session.end_date|date:"l, F d, Y" }}</b>.
             </p>
         {% elif academic_session.status == "upcomming" %}
             <p>
-                Academic session: <strong>{{ academic_session.session_name }}</strong> will start on 
-                <strong>{{ academic_session.start_date|date:"l, F d, Y" }}</strong>.
+                Academic session: <b>{{ academic_session.session_name }}</b> will start on 
+                <b>{{ academic_session.start_date|date:"l, F d, Y" }}</b>.
             </p>
         {% elif academic_session.status == "completed" %}
             <p>
-                Academic session: <strong>{{ academic_session.session_name }}</strong> ended on 
-                <strong>{{ academic_session.end_date|date:"l, F d, Y" }}</strong>.
+                Academic session: <b>{{ academic_session.session_name }}</b> ended on 
+                <b>{{ academic_session.end_date|date:"l, F d, Y" }}</b>.
             </p>
         {% else %}
             <p>
-                Academic session: <strong>{{ academic_session.session_name }}</strong> status is unknown.
+                Academic session: <b>{{ academic_session.session_name }}</b> status is unknown.
             </p>
         {% endif %}
     </div>
 
     <!-- Overall Academic Session Progress -->
     <div class="progress mb-4" style="height: 20px;">
-        <div class="progress-bar bg-success" role="progressbar" style="width: {% days_attained academic_session.start_date %}%" aria-valuenow="{% days_attained academic_session.start_date %}" aria-valuemin="0" aria-valuemax="{% max_days academic_session.end_date academic_session.start_date %}">
-            Session Progress: {% days_attained academic_session.start_date %}
+        <div class="progress-bar bg-success" role="progressbar" style="width: {% days_passed academic_session.start_date %}%" aria-valuenow="{% days_passed academic_session.start_date %}" aria-valuemin="0" aria-valuemax="{% days_between academic_session.end_date academic_session.start_date %}">
+            Session Progress: {% days_passed academic_session.start_date %}
         </div>
     </div>
     <!-- Term Details -->
@@ -182,8 +189,8 @@
                         {{ term.start_date|date:"F d, Y" }} - {{ term.end_date|date:"F d, Y" }}
                     </p>
                     <div class="progress" style="height: 15px;">
-                        <div class="progress-bar bg-info" role="progressbar" style="width: {% days_attained term.start_date %}" aria-valuenow="{% days_attained term.start_date %}" aria-valuemin="0" aria-valuemax="{% max_days term.end_date term.start_date %}">
-                            {% days_attained term.start_date %}
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {% days_passed term.start_date %}" aria-valuenow="{% days_passed term.start_date %}" aria-valuemin="0" aria-valuemax="{% days_between term.end_date term.start_date %}">
+                            {% days_passed term.start_date %}
                         </div>
                     </div>
                 </div>
@@ -453,11 +460,11 @@
     <!-- Metadata Details -->
     <div class="card mb-4">
         <div class="card-body">
-            <p><strong>Language of Instruction:</strong> {{ school.schoolmetadata.get_language_of_instruction_display|default:"Not set" }}</p>
-            <p><strong>Enrollment Capacity:</strong> {{ school.schoolmetadata.enrollment_capacity|default:"Not set" }}</p>
-            <p><strong>Ownership Status:</strong> {{ school.schoolmetadata.ownership_status|default:"Not set" }}</p>
-            <p><strong>Owner Name:</strong> {{ school.schoolmetadata.owner|default:"Not set" }}</p>
-            <p><strong>Compliance Percentage:</strong> {{ school.schoolmetadata.compliance_percentage|default_if_none:"N/A" }}</p>
+            <p><b>Language of Instruction:</b> {{ school.schoolmetadata.get_language_of_instruction_display|default:"Not set" }}</p>
+            <p><b>Enrollment Capacity:</b> {{ school.schoolmetadata.enrollment_capacity|default:"Not set" }}</p>
+            <p><b>Ownership Status:</b> {{ school.schoolmetadata.ownership_status|default:"Not set" }}</p>
+            <p><b>Owner Name:</b> {{ school.schoolmetadata.owner|default:"Not set" }}</p>
+            <p><b>Compliance Percentage:</b> {{ school.schoolmetadata.compliance_percentage|default_if_none:"N/A" }}</p>
         </div>
     </div>
     <!-- Action Links -->
@@ -486,17 +493,17 @@
     <!-- Current Accreditation Details -->
     <div class="card mb-4">
         <div class="card-body">
-            <p><strong>Accreditation Status:</strong> {{ accr.get_status_display }}</p>
-            <p><strong>Valid From:</strong> {{ accr.valid_from|date:"F d, Y" }}</p>
-            <p><strong>Valid To:</strong> {{ accr.valid_to|date:"F d, Y" }}</p>
+            <p><b>Accreditation Status:</b> {{ accr.get_status_display }}</p>
+            <p><b>Valid From:</b> {{ accr.valid_from|date:"F d, Y" }}</p>
+            <p><b>Valid To:</b> {{ accr.valid_to|date:"F d, Y" }}</p>
             {% if accr.expired %}
             <div class="alert alert-danger">
-                <strong>Accreditation expired</strong>
+                <b>Accreditation expired</b>
             </div>
             {% endif %}
             <!-- Progress Bar for Accreditation Validity -->
             <div class="progress mb-3" style="height: 20px;">
-                <div class="progress-bar bg-success" role="progressbar" style="width: {% percentage_attained accr.valid_from accr.valid_to %}%" aria-valuenow="{% days_attained accr.valid_from %}" aria-valuemin="0" aria-valuemax="{% max_days accr.valid_to accr.valid_from %}">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {% percentage_attained accr.valid_from accr.valid_to %}%" aria-valuenow="{% days_passed accr.valid_from %}" aria-valuemin="0" aria-valuemax="{% days_between accr.valid_to accr.valid_from %}">
                     {% percentage_attained accr.valid_from accr.valid_to %}%
                 </div>
             </div>
@@ -539,13 +546,13 @@
     <!-- Latest Suspension Details -->
     <div class="card mb-4">
         <div class="card-body">
-            <p><strong>Suspension Type:</strong> {{ suspension.suspension_type }}</p>
-            <p><strong>Reason:</strong> {{ suspension.reason }}</p>
-            <p><strong>To Take Effect From:</strong> {{ suspension.suspended_from|date:"F d, Y" }}</p>
+            <p><b>Suspension Type:</b> {{ suspension.suspension_type }}</p>
+            <p><b>Reason:</b> {{ suspension.reason }}</p>
+            <p><b>To Take Effect From:</b> {{ suspension.suspended_from|date:"F d, Y" }}</p>
             {% if suspension.is_indefinite %}
-            <p><strong>Until:</strong> Indefinite</p>
+            <p><b>Until:</b> Indefinite</p>
             {% else %}
-            <p><strong>Suspended Until:</strong> {{ suspension.suspended_to|date:"F d, Y" }}</p>
+            <p><b>Suspended Until:</b> {{ suspension.suspended_to|date:"F d, Y" }}</p>
             {% endif %}
             <!-- Action Buttons -->
             <div class="d-flex justify-content-between mt-3">
@@ -579,9 +586,9 @@
     <!-- Latest Inspection Report Details -->
     <div class="card mb-4">
         <div class="card-body">
-            <p><strong>Findings:</strong> {{ report.findings_mk }}</p>
-            <p><strong>Recommendations:</strong> {{ report.recommendations_mk }}</p>
-            <p><strong>Report Undertaken On:</strong> {{ report.date|date:"F d, Y" }}</p>
+            <p><b>Findings:</b> {{ report.findings_mk }}</p>
+            <p><b>Recommendations:</b> {{ report.recommendations_mk }}</p>
+            <p><b>Report Undertaken On:</b> {{ report.date|date:"F d, Y" }}</p>
             <p><a href="{% url 'schools:inspection_report_all' school.pk %}" class="btn btn-secondary">
                     View all inspection reports for this school
                 </a>

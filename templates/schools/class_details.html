@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %} Class Details| SAMSES {% endblock %}
+
+{% block style %}
+     table td,
+    table th {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    }
+    tbody td {
+    font-weight: 500;
+    }
+{% endblock style %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Class Details: {{ class_obj.class_section_name }}</h2>
+
+    <!-- Basic Class Information -->
+    <div class="card mb-4">
+        <div class="card-header">Class Information</div>
+        <div class="card-body">
+            <p><strong>Program:</strong> {{ class_obj.program_level_template.get_program_display }}</p>
+            <p><strong>Level:</strong> {{ class_obj.program_level_template.level }}</p>
+            <p><strong>Stream:</strong> {{ class_obj.stream.name|default:"None" }}</p>
+            <p><strong>Capacity:</strong> {{ class_obj.capacity }}</p>
+        </div>
+    </div>
+
+    <!-- Enrolled Students -->
+    <div class="card mb-4">
+        <div class="card-header border-0">Enrolled Students</div>
+        <div class="card-body border-0">
+            {% if enrolled_students %}
+                <table class="table table-borderedless table-light">
+                    <thead>
+                        <tr>
+                            <th>Admission Number</th>
+                            <th>Full Name</th>
+                            <th>Gender</th>
+                            <th>Age</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in enrolled_students %}
+                            <tr>
+                                <td>{{ record.student.reg_num }}</td>
+                                <td>{{ record.student.full_name }}</td>
+                                <td>{{ record.student.gender }}</td>
+                                <td>{{ record.student.age }}</td>
+                                <td>
+                                    <a href="" class="btn btn-primary btn-sm">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No students are currently enrolled in this class.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Subjects -->
+    <div class="card mb-4">
+        <div class="card-header">Subjects Offered</div>
+        <div class="card-body">
+            {% if subjects %}
+                <div class="btn-group gap-3 fw-bold" role="group">
+                    {% for subject in subjects %}
+                        <a href="{% url 'schools:subject_detail' subject.id %}" class="btn btn-outline-danger btn-sm fw-bold">
+                            {{ subject.subject_name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No subjects are currently assigned to this class.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Teachers -->
+    <div class="card mb-4">
+        <div class="card-header">Assigned Staff</div>
+        <div class="card-body">
+            {% if assigned_staff %}
+                <ul>
+                    {% for staff in assigned_staff %}
+                        <li>{{ staff.full_name }} - {{ staff.get_position_display }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No staff assigned to this class.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
