@@ -104,5 +104,6 @@ python manage.py runserver
 ---  
 
 ### **Documentation**
-- [SAMSES White Paper](./SAMSES_White_Paper.pdf)  
+- [Download SAMSES White Paper](https://github.com/webalb/samses/raw/main/SAMSES_White_Paper.pdf)
+
 
