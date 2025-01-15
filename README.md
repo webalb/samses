@@ -1,6 +1,4 @@
 
----
-
 # **SAMSES: Smart Administration and Management System for Education System**  
 
 *A smarter way to manage education for a smarter generation.*  
@@ -45,12 +43,9 @@ SAMSES (**Smart Administration and Management System for Education System**) is 
 
 ## **Flows Algorithm**  
 
-SAMSES employs the **Flows Algorithm** to revolutionize the management of academic records.  
-### Key Benefits:  
-- **Real-Time Updates:** Every term/session milestone is timestamped, ensuring accurate lifecycle tracking.  
-- **Data Integrity:** Prevents unauthorized edits or the creation of duplicate student records.  
-- **Effortless Certificate Generation:** Automates FSLC and other certifications, reducing administrative workload.  
-- **Interoperability:** Supports seamless data sharing across schools within the state.  
+The Flows Algorithm is an innovative system for securely recording and validating student academic records, designed with blockchain-inspired principles. Each "flow" represents a student’s academic data for a specific period, such as a term or session, including school, class, exam scores, and awards. These records are cryptographically hashed (using SHA-256) with metadata such as prior flow headers, school private keys, the number of students whose flows are created at the time, and class metrics. This process creates a tamper-evident chain of interconnected flows, ensuring data integrity and authenticity.
+
+This algorithm provides a centralized, tamper-proof framework for validating the trustworthiness of digital identities. By securing every record in a chain linked through cryptographic hashes, it creates a single source of truth. Applications include seamless digital certificate issuance and validation, fraud prevention, and fostering confidence in academic systems. The Flows Algorithm establishes a resilient backbone for trust across institutions, employers, and legal entities. 
 
 ---  
 
@@ -108,20 +103,6 @@ python manage.py runserver
 
 ---  
 
-## **Contributing**  
+### **Documentation**
+- [SAMSES White Paper](./docs/SAMSES_White_Paper.pdf)  
 
-We welcome contributions to SAMSES! Whether you’re a developer, educator, or policymaker, your input helps make SAMSES even better. Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.  
-
----  
-
-## **Contact Us**  
-
-For inquiries or support, reach out to **support@samses.edu** or visit our [official website](https://www.samses.edu).  
-
----  
-
-> *"A smarter way to manage education for a smarter generation."*  
-
-**SAMSES Development Team**  
-
----  
